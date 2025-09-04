@@ -96,22 +96,22 @@ export default function GreenLeafEvents() {
                   >
                     Attending
                   </button>
-                  <button
+                  {/* <button
                     onClick={() => handleRSVP('event1', 'not-attending')}
                     className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium transition duration-200"
                   >
                     Not Attending
-                  </button>
+                  </button> */}
                 </div>
                 <div className="flex justify-between text-sm text-gray-600">
                   <span className="flex items-center">
                     <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
                     {rsvpStatus.event1.attending} Attending
                   </span>
-                  <span className="flex items-center">
+                  {/* <span className="flex items-center">
                     <div className="w-2 h-2 bg-gray-400 rounded-full mr-2"></div>
                     {rsvpStatus.event1.notAttending} Not Attending
-                  </span>
+                  </span> */}
                 </div>
               </div>
 
@@ -181,22 +181,22 @@ export default function GreenLeafEvents() {
                   >
                     Attending
                   </button>
-                  <button
+                  {/* <button
                     onClick={() => handleRSVP('event2', 'not-attending')}
                     className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium transition duration-200"
                   >
                     Not Attending
-                  </button>
+                  </button> */}
                 </div>
                 <div className="flex justify-between text-sm text-gray-600">
                   <span className="flex items-center">
                     <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
                     {rsvpStatus.event2.attending} Attending
                   </span>
-                  <span className="flex items-center">
+                  {/* <span className="flex items-center">
                     <div className="w-2 h-2 bg-gray-400 rounded-full mr-2"></div>
                     {rsvpStatus.event2.notAttending} Not Attending
-                  </span>
+                  </span> */}
                 </div>
               </div>
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Mail, Lock } from 'lucide-react';
+import { User, Mail, Lock, Link } from 'lucide-react';
 
 export default function GreenLeafSignUp() {
   const [formData, setFormData] = useState({
@@ -34,10 +34,10 @@ export default function GreenLeafSignUp() {
         </div>
 
         {/* Sign Up Form */}
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h2 className="text-xl font-semibold text-center text-gray-800 mb-6">
+       <div className="bg-white rounded-lg shadow-md p-8">
+         <Link to="/"> <h2 className="text-xl font-semibold text-center text-gray-800 mb-6">
             Sign Up
-          </h2>
+          </h2></Link> 
           
           <div className="space-y-4">
             {/* Name Field */}

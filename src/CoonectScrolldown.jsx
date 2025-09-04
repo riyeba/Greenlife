@@ -114,13 +114,13 @@ const SportsConnect = () => {
     <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100">
       <div className="relative">
         <div className="h-24 sm:h-32 bg-gradient-to-r from-green-400 to-blue-500 rounded-t-xl"></div>
-        {profile.verified && (
+        {/* {profile.verified && (
           <div className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-white rounded-full p-1">
             <div className="w-5 h-5 sm:w-6 sm:h-6 bg-blue-500 rounded-full flex items-center justify-center">
               <span className="text-white text-xs">✓</span>
             </div>
           </div>
-        )}
+        )} */}
       </div>
       
       <div className="p-4 sm:p-6 -mt-12 sm:-mt-16 relative">

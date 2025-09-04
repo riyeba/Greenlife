@@ -85,7 +85,7 @@ function Header() {
               </NavLink>
               
               <NavLink 
-                to="/messages" 
+                to="/register" 
                 className={({ isActive }) => getNavLinkClass(
                   isActive,
                   "flex items-center px-2 py-1 rounded-md transition-colors duration-200",

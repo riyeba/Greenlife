@@ -3,7 +3,7 @@ import { Home, Calendar, User, LogOut, Edit, Image, Plus } from 'lucide-react';
 
 export default function GreenLeafProfile() {
   const [activeTab, setActiveTab] = useState('Posts');
-  const [postText, setPostText] = useState("What's happening in your green world?");
+  const [postText, setPostText] = useState("");
 
   const handlePost = () => {
     console.log('Post submitted:', postText);
