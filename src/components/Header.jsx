@@ -307,7 +307,7 @@ function Header() {
             </NavLink>
             
             <NavLink 
-              to="/messages" 
+              to="/register" 
               onClick={() => handleMobileNavClick()}
               className={({ isActive }) => getNavLinkClass(
                 isActive,
