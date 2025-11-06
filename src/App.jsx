@@ -18,6 +18,7 @@ import SportsConnect from "./CoonectScrolldown";
 import SkaotsPlatform from "./components/HomeSceenshort";
 import Header from "./components/Header";
 import SportsRegistration from "./Register";
+import NewProfile from "./NewProfile";
 
 
 
@@ -35,7 +36,9 @@ function App() {
         <Route path="/feed" element={<GreenLeafFeed/>} />  
         <Route path="/connect" element={< SportsConnect />} /> 
         <Route path="/feedingi" element={< SkaotsPlatform />} /> 
-        <Route path="/register" element={< SportsRegistration />} /> 
+        <Route path="/register" element={< SportsRegistration />} />
+        <Route path="/newprofile" element={<  NewProfile />} />
+        
       </Routes>
       
       

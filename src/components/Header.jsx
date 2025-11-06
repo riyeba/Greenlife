@@ -110,6 +110,19 @@ function Header() {
                 <span className="hidden xl:inline">Profile</span>
               </NavLink>
 
+               <NavLink 
+                to="/newprofile" 
+                className={({ isActive }) => getNavLinkClass(
+                  isActive,
+                  "flex items-center px-2 py-1 rounded-md transition-colors duration-200",
+                  "text-green-600 bg-green-50",
+                  "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+                )}
+              >
+                <User className="w-4 h-4 mr-1" />
+                <span className="hidden xl:inline">NewProfile</span>
+              </NavLink>
+
               <NavLink 
                 to="/connect" 
                 className={({ isActive }) => getNavLinkClass(
@@ -332,6 +345,20 @@ function Header() {
             >
               <User className="w-6 h-6 mr-3" />
               Profile
+            </NavLink>
+
+            <NavLink
+              to="/newprofile" 
+              onClick={() => handleMobileNavClick()}
+              className={({ isActive }) => getNavLinkClass(
+                isActive,
+                "flex items-center text-xl py-4 px-2 rounded-lg transition-colors duration-200",
+                "text-green-600 bg-green-50",
+                "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+              )}
+            >
+              <User className="w-6 h-6 mr-3" />
+              New Profile
             </NavLink>
             
             <NavLink 
