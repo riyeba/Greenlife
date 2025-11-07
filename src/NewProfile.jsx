@@ -118,7 +118,7 @@ export default function NewProfile() {
         </div>
 
         {/* About Me */}
-        <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-6">
+        <div className="bg-white rounded-2xl shadow-xl p-4 md:p-8 mb-6">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-5 flex items-center gap-3">
             <div className="p-2 bg-emerald-100 rounded-lg">
               <User className="text-[#00D66C]" size={28} />
@@ -131,7 +131,7 @@ export default function NewProfile() {
         </div>
 
         {/* Achievements */}
-        <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-6">
+        <div className="bg-white rounded-2xl shadow-xl p-4 md:p-8 mb-6">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-5 flex items-center gap-3">
             <div className="p-2 bg-emerald-100 rounded-lg">
               <Trophy className="text-[#00D66C]" size={28} />
@@ -150,7 +150,7 @@ export default function NewProfile() {
         </div>
 
         {/* Game Highlights */}
-        <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-6">
+        <div className="bg-white rounded-2xl shadow-xl p-4 md:p-8 mb-6">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-5 flex items-center gap-3">
             <div className="p-2 bg-emerald-100 rounded-lg">
               <Play className="text-[#00D66C]" size={28} />
@@ -170,7 +170,7 @@ export default function NewProfile() {
         </div>
 
         {/* Job Experience */}
-        <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-6">
+        <div className="bg-white rounded-2xl shadow-xl p-4 md:p-8 mb-6">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 flex items-center gap-3">
             <div className="p-2 bg-emerald-100 rounded-lg">
               <Briefcase className="text-[#00D66C]" size={28} />
@@ -200,7 +200,7 @@ export default function NewProfile() {
         </div>
 
         {/* Education */}
-        <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8">
+        <div className="bg-white rounded-2xl shadow-xl p-4 md:p-8">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 flex items-center gap-3">
             <div className="p-2 bg-emerald-100 rounded-lg">
               <GraduationCap className="text-[#00D66C]" size={28} />
@@ -211,10 +211,10 @@ export default function NewProfile() {
             <table className="w-full">
               <thead>
                 <tr className="bg-gradient-to-r from-emerald-50 to-teal-50">
-                  <th className="text-left py-4 px-6 font-bold text-gray-800 text-sm md:text-base">School Name</th>
-                  <th className="text-left py-4 px-6 font-bold text-gray-800 text-sm md:text-base">Field of Study</th>
-                  <th className="text-left py-4 px-6 font-bold text-gray-800 text-sm md:text-base">Education Level</th>
-                  <th className="text-center py-4 px-6 font-bold text-gray-800">
+                  <th className="text-left py-4 px-4 font-bold text-gray-800 text-sm md:text-base">School Name</th>
+                  <th className="text-left py-4 px-4 font-bold text-gray-800 text-sm md:text-base">Field of Study</th>
+                  <th className="text-left py-4 px-4 font-bold text-gray-800 text-sm md:text-base">Education Level</th>
+                  <th className="text-center py-4 px-4 font-bold text-gray-800">
                     <GraduationCap className="inline text-[#00D66C]" size={24} />
                   </th>
                 </tr>
@@ -222,10 +222,10 @@ export default function NewProfile() {
               <tbody>
                 {education.map((edu, index) => (
                   <tr key={index} className="border-b border-gray-100 hover:bg-emerald-50 transition-colors duration-200">
-                    <td className="py-4 px-6 text-gray-800 font-medium text-sm md:text-base">{edu.school}</td>
-                    <td className="py-4 px-6 text-gray-600 text-sm md:text-base">{edu.field}</td>
-                    <td className="py-4 px-6 text-gray-600 text-sm md:text-base">{edu.level}</td>
-                    <td className="py-4 px-6 text-center">
+                    <td className="py-4 px-4 text-gray-800 font-medium text-sm md:text-base">{edu.school}</td>
+                    <td className="py-4 px-4 text-gray-600 text-sm md:text-base">{edu.field}</td>
+                    <td className="py-4 px-4 text-gray-600 text-sm md:text-base">{edu.level}</td>
+                    <td className="py-4 px-4 text-center">
                       {edu.completed ? (
                         <svg className="inline w-6 h-6 text-[#00D66C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
