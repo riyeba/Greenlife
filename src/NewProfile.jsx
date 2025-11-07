@@ -62,31 +62,31 @@ export default function NewProfile() {
                   <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">{profile.name}</h1>
                   <div className="space-y-2 text-gray-700">
                     <div className="flex gap-2">
-                      <span className="font-medium text-gray-600">Profession:</span>
+                      <span className="font-medium text-gray-600  min-w-[140px] sm:min-w-[160px]">Profession:</span>
                       <span className="text-gray-500">{profile.profession}</span>
                     </div>
                     <div className="flex gap-2">
-                      <span className="font-medium text-gray-600">Current Team:</span>
+                      <span className="font-medium text-gray-600  min-w-[140px] sm:min-w-[160px]">Current Team:</span>
                       <span className="text-gray-500">{profile.team}</span>
                     </div>
                     <div className="flex gap-2">
-                      <span className="font-medium text-gray-600">Height:</span>
+                      <span className="font-medium text-gray-600  min-w-[140px] sm:min-w-[160px]">Height:</span>
                       <span className="text-gray-500">{profile.height}</span>
                     </div>
                     <div className="flex gap-2">
-                      <span className="font-medium text-gray-600">Age:</span>
+                      <span className="font-medium text-gray-600  min-w-[140px] sm:min-w-[160px]">Age:</span>
                       <span className="text-gray-500">{profile.age}</span>
                     </div>
                     <div className="flex gap-2">
-                      <span className="font-medium text-gray-600">Father's nationality:</span>
+                      <span className="font-medium text-gray-600  min-w-[140px] sm:min-w-[160px]">Father's nationality:</span>
                       <span className="text-gray-500">{profile.fatherNationality}</span>
                     </div>
                     <div className="flex gap-2">
-                      <span className="font-medium text-gray-600">Mother's Nationality:</span>
+                      <span className="font-medium text-gray-600  min-w-[140px] sm:min-w-[160px]">Mother's Nationality:</span>
                       <span className="text-gray-500">{profile.motherNationality}</span>
                     </div>
                     <div className="flex gap-2">
-                      <span className="font-medium text-gray-600">Country of birth:</span>
+                      <span className="font-medium text-gray-600  min-w-[140px] sm:min-w-[160px]">Country of birth:</span>
                       <span className="text-gray-500">{profile.birthCountry}</span>
                     </div>
                   </div>
