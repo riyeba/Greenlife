@@ -87,7 +87,21 @@ export default function NewProfile() {
                 </div>
 
                 {/* Connection count - Top Right */}
-                <div className="flex items-center gap-3 text-gray-500 ml-auto">
+                
+              </div>
+
+              
+
+              {/* Bottom Row - Connect Button */}
+              <div className= 'flex items-center justify-between'>
+
+                <div>
+                <button className="bg-[#00D66C] hover:bg-[#00C05E] text-white px-12 py-3 rounded-lg flex items-center justify-center gap-2 transition-colors duration-200 shadow-md w-full md:w-auto">
+                  <Users size={20} />
+                  Connect
+                </button>
+              </div>
+                <div className="flex items-center gap-3 text-gray-500  mb-0">
                   <MessageCircle size={20} />
                   <span>•</span>
                   <div className="flex items-center gap-1">
@@ -95,14 +109,8 @@ export default function NewProfile() {
                     <span className="font-medium">{profile.connections}</span>
                   </div>
                 </div>
-              </div>
-
-              {/* Bottom Row - Connect Button */}
-              <div>
-                <button className="bg-[#00D66C] hover:bg-[#00C05E] text-white px-12 py-3 rounded-lg flex items-center justify-center gap-2 transition-colors duration-200 shadow-md w-full md:w-auto">
-                  <Users size={20} />
-                  Connect
-                </button>
+              
+              
               </div>
             </div>
           </div>
