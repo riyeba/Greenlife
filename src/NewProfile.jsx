@@ -136,7 +136,7 @@ export default function NewProfile() {
             <div className="p-2 bg-emerald-100 rounded-lg">
               <Trophy className="text-[#00D66C]" size={28} />
             </div>
-            Achievement/Accomplishment
+            Achievement
           </h2>
           <div className="border-2 border-dashed border-gray-200 rounded-xl p-6">
             <div className="flex flex-wrap gap-4 justify-center">
