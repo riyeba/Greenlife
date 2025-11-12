@@ -39,10 +39,10 @@ export default function NewProfile() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-8">
       <div className="max-w-6xl mx-auto p-4 md:p-8">
         {/* Header Card */}
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-6">
+        <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-4 sm:mb-6">
           <div className="px-6 md:px-8 py-8">
             <div className="flex flex-col gap-6">
               {/* Top Row - Avatar and Info */}
@@ -59,35 +59,35 @@ export default function NewProfile() {
             </div>
                 
                  <div className="flex-1">
-                  <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">{profile.name}</h1>
-                  <div className="space-y-2 text-gray-700">
+                  <h1 className="text-3xl md:text-3xl font-bold text-gray-900 mb-6">{profile.name}</h1>
+                  <div className="space-y-2">
                     <div className="flex gap-2">
-                      <span className="font-medium text-gray-600  min-w-[140px] sm:min-w-[160px]">Profession:</span>
-                      <span className="text-gray-500">{profile.profession}</span>
+                      <span className="font-medium text-gray-800  min-w-[140px] sm:min-w-[160px]">Profession:</span>
+                      <span className="text-gray-900 ">{profile.profession}</span>
                     </div>
                     <div className="flex gap-2">
-                      <span className="font-medium text-gray-600  min-w-[140px] sm:min-w-[160px]">Current Team:</span>
-                      <span className="text-gray-500">{profile.team}</span>
+                      <span className="font-medium text-gray-800  min-w-[140px] sm:min-w-[160px]">Current Team:</span>
+                      <span className="text-gray-900">{profile.team}</span>
                     </div>
                     <div className="flex gap-2">
-                      <span className="font-medium text-gray-600  min-w-[140px] sm:min-w-[160px]">Height:</span>
-                      <span className="text-gray-500">{profile.height}</span>
+                      <span className="font-medium text-gray-800  min-w-[140px] sm:min-w-[160px]">Height:</span>
+                      <span className="text-gray-900 ">{profile.height}</span>
                     </div>
                     <div className="flex gap-2">
-                      <span className="font-medium text-gray-600  min-w-[140px] sm:min-w-[160px]">Age:</span>
-                      <span className="text-gray-500">{profile.age}</span>
+                      <span className="font-medium text-gray-800  min-w-[140px] sm:min-w-[160px]">Age:</span>
+                      <span className="text-gray-900 ">{profile.age}</span>
                     </div>
                     <div className="flex gap-2">
-                      <span className="font-medium text-gray-600  min-w-[140px] sm:min-w-[160px]">Father's nationality:</span>
-                      <span className="text-gray-500">{profile.fatherNationality}</span>
+                      <span className="font-medium text-gray-800  min-w-[140px] sm:min-w-[160px]">Father's nationality:</span>
+                      <span className="text-gray-900">{profile.fatherNationality}</span>
                     </div>
                     <div className="flex gap-2">
-                      <span className="font-medium text-gray-600  min-w-[140px] sm:min-w-[160px]">Mother's Nationality:</span>
-                      <span className="text-gray-500">{profile.motherNationality}</span>
+                      <span className="font-medium text-gray-800  min-w-[140px] sm:min-w-[160px]">Mother's Nationality:</span>
+                      <span className="text-gray-900">{profile.motherNationality}</span>
                     </div>
                     <div className="flex gap-2">
-                      <span className="font-medium text-gray-600  min-w-[140px] sm:min-w-[160px]">Country of birth:</span>
-                      <span className="text-gray-500">{profile.birthCountry}</span>
+                      <span className="font-medium text-gray-800  min-w-[140px] sm:min-w-[160px]">Country of birth:</span>
+                      <span className="text-gray-900">{profile.birthCountry}</span>
                     </div>
                   </div>
                 </div>
@@ -119,7 +119,7 @@ export default function NewProfile() {
 
         {/* About Me */}
         <div className="bg-white rounded-2xl shadow-xl p-4 md:p-8 mb-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-5 flex items-center gap-3">
+          <h2 className="text-2xl md:text-2xl font-bold text-gray-900 mb-5 flex items-center gap-3">
             <div className="p-2 bg-emerald-100 rounded-lg">
               <User className="text-[#00D66C]" size={28} />
             </div>
@@ -132,7 +132,7 @@ export default function NewProfile() {
 
         {/* Achievements */}
         <div className="bg-white rounded-2xl shadow-xl p-4 md:p-8 mb-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-5 flex items-center gap-3">
+          <h2 className="text-2xl md:text-2xl font-bold text-gray-900 mb-5 flex items-center gap-3">
             <div className="p-2 bg-emerald-100 rounded-lg">
               <Trophy className="text-[#00D66C]" size={28} />
             </div>
@@ -151,7 +151,7 @@ export default function NewProfile() {
 
         {/* Game Highlights */}
         <div className="bg-white rounded-2xl shadow-xl p-4 md:p-8 mb-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-5 flex items-center gap-3">
+          <h2 className="text-2xl md:text-2xl font-bold text-gray-900 mb-5 flex items-center gap-3">
             <div className="p-2 bg-emerald-100 rounded-lg">
               <Play className="text-[#00D66C]" size={28} />
             </div>
@@ -171,7 +171,7 @@ export default function NewProfile() {
 
         {/* Job Experience */}
         <div className="bg-white rounded-2xl shadow-xl p-4 md:p-8 mb-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+          <h2 className="text-2xl md:text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
             <div className="p-2 bg-emerald-100 rounded-lg">
               <Briefcase className="text-[#00D66C]" size={28} />
             </div>
@@ -201,7 +201,7 @@ export default function NewProfile() {
 
         {/* Education */}
         <div className="bg-white rounded-2xl shadow-xl p-4 md:p-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+          <h2 className="text-2xl md:text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
             <div className="p-2 bg-emerald-100 rounded-lg">
               <GraduationCap className="text-[#00D66C]" size={28} />
             </div>
