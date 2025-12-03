@@ -83,6 +83,18 @@ function Header() {
                 <Users className="w-4 h-4 mr-1" />
                 <span className="hidden xl:inline">Feed</span>
               </NavLink>
+              <NavLink 
+                to="/notification" 
+                className={({ isActive }) => getNavLinkClass(
+                  isActive,
+                  "flex items-center px-2 py-1 rounded-md transition-colors duration-200",
+                  "text-green-600 bg-green-50",
+                  "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+                )}
+              >
+                <Users className="w-4 h-4 mr-1" />
+                <span className="hidden xl:inline">Notification</span>
+              </NavLink>
               
               <NavLink 
                 to="/register" 

@@ -19,6 +19,7 @@ import SkaotsPlatform from "./components/HomeSceenshort";
 import Header from "./components/Header";
 import SportsRegistration from "./Register";
 import NewProfile from "./NewProfile";
+import NotificationsPage from "./components/Notificationpage";
 
 
 
@@ -38,6 +39,7 @@ function App() {
         <Route path="/feedingi" element={< SkaotsPlatform />} /> 
         <Route path="/register" element={< SportsRegistration />} />
         <Route path="/newprofile" element={<  NewProfile />} />
+        <Route path="/notification" element={<  NotificationsPage />} /> 
         
       </Routes>
       
