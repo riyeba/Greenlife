@@ -20,6 +20,7 @@ import Header from "./components/Header";
 import SportsRegistration from "./Register";
 import NewProfile from "./NewProfile";
 import NotificationsPage from "./components/Notificationpage";
+import EventManagement from "./components/ManagementPage";
 
 
 
@@ -40,6 +41,7 @@ function App() {
         <Route path="/register" element={< SportsRegistration />} />
         <Route path="/newprofile" element={<  NewProfile />} />
         <Route path="/notification" element={<  NotificationsPage />} /> 
+        <Route path="/management" element={< EventManagement />} /> 
         
       </Routes>
       
