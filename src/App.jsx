@@ -20,7 +20,8 @@ import Header from "./components/Header";
 import SportsRegistration from "./Register";
 import NewProfile from "./NewProfile";
 import NotificationsPage from "./components/Notificationpage";
-import EventManagement from "./components/ManagementPage";
+import EventManagement from "./components/EventManagements";
+
 
 
 
