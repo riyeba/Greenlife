@@ -1,6 +1,3 @@
-
-
-
 import React, { useState } from 'react';
 import { Calendar, Clock, Users, Plus, Send, Search, Filter, MapPin, Star, Heart, Share2, Bell, User, Settings, LogOut, X, Upload, Image as ImageIcon } from 'lucide-react';
 
@@ -8,18 +5,37 @@ export default function EventManagement() {
   const [activeTab, setActiveTab] = useState('events');
   const [announcement, setAnnouncement] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [likedEvents, setLikedEvents] = useState(new Set());
-  const [myEvents, setMyEvents] = useState(new Set([1])); // User already RSVP'd to event 1
+  const [myEvents, setMyEvents] = useState(new Set([1]));
+  const [nextEventId, setNextEventId] = useState(7);
   const [newEvent, setNewEvent] = useState({
     title: '',
     date: '',
     time: '',
     location: '',
     category: 'Sports',
-    description: ''
+    description: '',
+    image: ''
   });
+  const [imagePreview, setImagePreview] = useState('');
 
-  const allEvents = [
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewEvent({...newEvent, image: reader.result});
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const clearImage = () => {
+    setNewEvent({...newEvent, image: ''});
+    setImagePreview('');
+  };
+
+  const [allEvents, setAllEvents] = useState([
     {
       id: 1,
       title: 'Chicago youth Basketball',
@@ -86,9 +102,8 @@ export default function EventManagement() {
       image: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=400&h=300&fit=crop',
       description: 'Learn to cook authentic Italian cuisine from master chefs.'
     }
-  ];
+  ]);
 
-  // Filter events based on search
   const filteredEvents = allEvents.filter(event => 
     event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     event.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -96,7 +111,6 @@ export default function EventManagement() {
     event.location.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Get events user has RSVP'd to
   const myEventsList = allEvents.filter(event => myEvents.has(event.id));
 
   const handleSendAnnouncement = () => {
@@ -106,26 +120,28 @@ export default function EventManagement() {
     }
   };
 
-  const toggleLike = (eventId) => {
-    setLikedEvents(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(eventId)) {
-        newSet.delete(eventId);
-      } else {
-        newSet.add(eventId);
-      }
-      return newSet;
-    });
-  };
-
   const handleRSVP = (eventId) => {
     setMyEvents(prev => {
       const newSet = new Set(prev);
+      const isRSVPing = !newSet.has(eventId);
+      
       if (newSet.has(eventId)) {
         newSet.delete(eventId);
+        // Decrease attendee count
+        setAllEvents(events => events.map(event => 
+          event.id === eventId 
+            ? {...event, attendees: Math.max(0, event.attendees - 1)}
+            : event
+        ));
         alert('You have cancelled your RSVP for this event.');
       } else {
         newSet.add(eventId);
+        // Increase attendee count
+        setAllEvents(events => events.map(event => 
+          event.id === eventId 
+            ? {...event, attendees: event.attendees + 1}
+            : event
+        ));
         alert('You have successfully RSVP\'d to this event!');
       }
       return newSet;
@@ -135,15 +151,34 @@ export default function EventManagement() {
   const handleCreateEvent = (e) => {
     e.preventDefault();
     if (newEvent.title && newEvent.date && newEvent.time && newEvent.location) {
-      alert(`Event "${newEvent.title}" created successfully!`);
+      const createdEvent = {
+        id: nextEventId,
+        title: newEvent.title,
+        date: newEvent.date,
+        time: newEvent.time,
+        attendees: 1,
+        location: newEvent.location,
+        category: newEvent.category,
+        description: newEvent.description,
+        image: newEvent.image || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=400&h=300&fit=crop'
+      };
+      
+      setAllEvents(prev => [...prev, createdEvent]);
+      setMyEvents(prev => new Set([...prev, nextEventId]));
+      setNextEventId(prev => prev + 1);
+      
+      alert(`Event "${newEvent.title}" created successfully! You've been automatically RSVP'd.`);
       setNewEvent({
         title: '',
         date: '',
         time: '',
         location: '',
         category: 'Sports',
-        description: ''
+        description: '',
+        image: ''
       });
+      setImagePreview('');
+      setActiveTab('myevents');
     } else {
       alert('Please fill in all required fields.');
     }
@@ -163,18 +198,6 @@ export default function EventManagement() {
         <div className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-white/90 backdrop-blur-sm px-2 sm:px-3 py-1 rounded-full text-xs font-semibold text-green-600">
           {event.category}
         </div>
-        <button
-          onClick={() => toggleLike(event.id)}
-          className="absolute top-2 sm:top-3 left-2 sm:left-3 bg-white/90 backdrop-blur-sm p-1.5 sm:p-2 rounded-full hover:bg-white transition-all duration-300 ease-in-out hover:scale-110"
-        >
-          <Heart
-            className={`w-4 h-4 sm:w-5 sm:h-5 transition-all duration-300 ease-in-out ${
-              likedEvents.has(event.id)
-                ? 'fill-red-500 text-red-500 scale-110'
-                : 'text-gray-600'
-            }`}
-          />
-        </button>
       </div>
       
       <div className="p-4 sm:p-5">
@@ -428,6 +451,80 @@ export default function EventManagement() {
 
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Event Image (Optional)
+                    </label>
+                    
+                    {/* Image Preview */}
+                    {imagePreview && (
+                      <div className="mb-3 relative">
+                        <img 
+                          src={imagePreview} 
+                          alt="Preview" 
+                          className="w-full h-48 object-cover rounded-xl"
+                        />
+                        <button
+                          type="button"
+                          onClick={clearImage}
+                          className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full transition-all duration-300 shadow-lg"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Upload Options */}
+                    <div className="space-y-3">
+                      {/* File Upload */}
+                      <div>
+                        <label className="block w-full cursor-pointer">
+                          <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-green-500 transition-all duration-300">
+                            <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                            <p className="text-sm font-medium text-gray-700">
+                              Click to upload from device
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              PNG, JPG, GIF up to 10MB
+                            </p>
+                          </div>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+
+                      {/* URL Input */}
+                      <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                          <div className="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div className="relative flex justify-center text-xs">
+                          <span className="px-2 bg-white text-gray-500">OR</span>
+                        </div>
+                      </div>
+
+                      <input
+                        type="url"
+                        value={!imagePreview ? newEvent.image : ''}
+                        onChange={(e) => {
+                          setNewEvent({...newEvent, image: e.target.value});
+                          setImagePreview('');
+                        }}
+                        placeholder="Paste image URL here"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        disabled={!!imagePreview}
+                      />
+                    </div>
+                    
+                    <p className="mt-2 text-xs text-gray-500">
+                      Upload an image from your device or paste an image URL. If left empty, a default image will be used.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
                       Description
                     </label>
                     <textarea
@@ -448,14 +545,18 @@ export default function EventManagement() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setNewEvent({
-                        title: '',
-                        date: '',
-                        time: '',
-                        location: '',
-                        category: 'Sports',
-                        description: ''
-                      })}
+                      onClick={() => {
+                        setNewEvent({
+                          title: '',
+                          date: '',
+                          time: '',
+                          location: '',
+                          category: 'Sports',
+                          description: '',
+                          image: ''
+                        });
+                        setImagePreview('');
+                      }}
                       className="px-6 bg-gray-100/80 hover:bg-gray-200/80 text-gray-700 py-3 rounded-xl font-medium transition-all duration-300 ease-in-out hover:shadow-sm transform hover:scale-[1.02] active:scale-95"
                     >
                       Clear
@@ -468,8 +569,8 @@ export default function EventManagement() {
 
           {/* Sidebar */}
           <div className="space-y-4 sm:space-y-6">
-            {/* Make Announcement Card */}
-            <div className="bg-gradient-to-br from-white to-green-50 rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-6 border border-green-100">
+            {/* Make Announcement Card - Sticky */}
+            <div className="sticky top-4 bg-gradient-to-br from-white to-green-50 rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-6 border border-green-100">
               <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4 flex items-center">
                 <Send className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-green-600" />
                 Make Announcement
@@ -492,77 +593,7 @@ export default function EventManagement() {
               </button>
             </div>
 
-            {/* Quick Stats */}
-            <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-6">
-              <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4">Quick Stats</h3>
-              
-              <div className="space-y-3 sm:space-y-4">
-                <div className="flex items-center justify-between p-3 sm:p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-lg sm:rounded-xl">
-                  <div className="flex items-center space-x-2 sm:space-x-3">
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 bg-green-500 rounded-lg flex items-center justify-center">
-                      <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-xs sm:text-sm text-gray-600">Total Events</p>
-                      <p className="text-lg sm:text-xl font-bold text-gray-800">{allEvents.length}</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex items-center justify-between p-3 sm:p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg sm:rounded-xl">
-                  <div className="flex items-center space-x-2 sm:space-x-3">
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-                      <Users className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-xs sm:text-sm text-gray-600">Attending</p>
-                      <p className="text-lg sm:text-xl font-bold text-gray-800">{myEvents.size}</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex items-center justify-between p-3 sm:p-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg sm:rounded-xl">
-                  <div className="flex items-center space-x-2 sm:space-x-3">
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 bg-purple-500 rounded-lg flex items-center justify-center">
-                      <Star className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-xs sm:text-sm text-gray-600">Favorites</p>
-                      <p className="text-lg sm:text-xl font-bold text-gray-800">{likedEvents.size}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Upcoming Events */}
-            <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-6">
-              <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4">Upcoming Soon</h3>
-              
-              <div className="space-y-2 sm:space-y-3">
-                <div className="flex items-start space-x-2 sm:space-x-3 p-2.5 sm:p-3 bg-gray-50 rounded-lg sm:rounded-xl hover:bg-gray-100/80 transition-all duration-300 ease-in-out cursor-pointer hover:shadow-sm transform hover:scale-[1.02]">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500 rounded-lg flex flex-col items-center justify-center text-white flex-shrink-0">
-                    <span className="text-xs font-semibold">DEC</span>
-                    <span className="text-base sm:text-lg font-bold">16</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-800 text-xs sm:text-sm truncate">Basketball Game</p>
-                    <p className="text-xs text-gray-600">14:20 PM</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-2 sm:space-x-3 p-2.5 sm:p-3 bg-gray-50 rounded-lg sm:rounded-xl hover:bg-gray-100/80 transition-all duration-300 ease-in-out cursor-pointer hover:shadow-sm transform hover:scale-[1.02]">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500 rounded-lg flex flex-col items-center justify-center text-white flex-shrink-0">
-                    <span className="text-xs font-semibold">JAN</span>
-                    <span className="text-base sm:text-lg font-bold">20</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-800 text-xs sm:text-sm truncate">Music Festival</p>
-                    <p className="text-xs text-gray-600">18:00 PM</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            
           </div>
         </div>
       </div>
