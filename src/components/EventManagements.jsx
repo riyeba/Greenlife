@@ -255,16 +255,7 @@ export default function EventManagement() {
           <div className="xl:col-span-2 space-y-4 sm:space-y-6">
             {/* Tab Navigation */}
             <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-1.5 sm:p-2 flex space-x-1 sm:space-x-2 overflow-x-auto">
-              <button
-                onClick={() => setActiveTab('events')}
-                className={`flex-1 min-w-[90px] py-2 sm:py-3 px-3 sm:px-6 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-all duration-300 ease-in-out whitespace-nowrap ${
-                  activeTab === 'events'
-                    ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md transform scale-[1.02]'
-                    : 'text-gray-600 hover:bg-gray-100/70 hover:text-gray-800'
-                }`}
-              >
-                All Events
-              </button>
+              
               <button
                 onClick={() => setActiveTab('myevents')}
                 className={`flex-1 min-w-[90px] py-2 sm:py-3 px-3 sm:px-6 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium transition-all duration-300 ease-in-out whitespace-nowrap ${
