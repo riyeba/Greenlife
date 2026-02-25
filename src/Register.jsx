@@ -1,880 +1,547 @@
-import React, { useState, useRef } from 'react';
-import { User, Users, Trophy, Heart, MapPin, Globe, Calendar, Camera, Trash2, X, RotateCw, ZoomIn, ZoomOut } from 'lucide-react';
+import React, { useState } from 'react';
+import { User, Users, Trophy, Heart, MapPin, Globe, Calendar, Ruler, Camera, Plus, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './LanguageSwitcher';
 
-const TRANSLATIONS = {
-  en: {
-    dir: 'ltr',
-    joinTitle: 'Join GreenLeaf',
-    joinSubtitle: 'Choose your category to get started',
-    registrationSuffix: 'Registration',
-    fillDetails: 'Fill in your details to join our sports community',
-    backToCategories: '← Back to categories',
-    completeRegistration: 'Complete Registration',
-    submitting: 'Submitting...',
-    cancel: 'Cancel',
-    profilePhoto: 'Profile Photo',
-    uploadPhoto: 'Upload a photo',
-    photoUploaded: 'Photo uploaded successfully!',
-    changePhoto: 'Change Photo',
-    photoHint: 'PNG, JPG, GIF up to 10MB',
-    cropTitle: 'Crop Profile Photo',
-    choosePhoto: 'Choose Photo',
-    uploadToStart: 'Upload a photo to get started',
-    zoom: 'Zoom',
-    rotation: 'Rotation',
-    cropAndUpload: 'Crop & Upload',
-    requiredMark: '*',
-    selectPlaceholder: (label) => `Select ${label}`,
-    missingFields: (fields) => `Please fill required fields: ${fields}`,
-    successMessage: 'Registration submitted successfully!',
-    failMessage: 'Submission failed. Please try again.',
-    categories: {
-      athlete: { label: 'Athlete', description: 'Professional or amateur sports player' },
-      coach: { label: 'Coach', description: 'Sports coach or trainer' },
-      scout: { label: 'Scout', description: 'Talent scout or sports agent' },
-      sportProfessional: { label: 'Sport Professional', description: 'Sports industry professional' },
-      fan: { label: 'Fan', description: 'Sports enthusiast and supporter' },
-    },
-    fields: {
-      fullName: 'Full Name', profession: 'Profession', sport: 'Sport Name',
-      dateOfBirth: 'Date of Birth', aboutYourself: 'Write about yourself',
-      currentTeam: 'Current Team', coachingSport: 'Coaching Sport',
-      currentCompany: 'Current Company', firstName: 'First Name',
-      lastName: 'Last Name', currentCompanyName: 'Company',
-      countryOfResidence: 'Country', email: 'Email',
-    },
-    placeholders: {
-      fullName: 'Enter your full name', profession: 'e.g., Professional Footballer',
-      currentTeam: 'e.g., Lagos United FC', coachProfession: 'e.g., Head Coach',
-      currentCompany: 'e.g., SportsTalent Agency', firstName: 'Enter first name',
-      lastName: 'Enter last name', currentCompanyName: 'Company name', email: 'Enter email',
-    },
-  },
-  ar: {
-    dir: 'rtl',
-    joinTitle: 'انضم إلى GreenLeaf',
-    joinSubtitle: 'اختر فئتك للبدء',
-    registrationSuffix: 'تسجيل',
-    fillDetails: 'أدخل بياناتك للانضمام إلى مجتمعنا الرياضي',
-    backToCategories: 'العودة إلى الفئات →',
-    completeRegistration: 'إتمام التسجيل',
-    submitting: 'جارٍ الإرسال...',
-    cancel: 'إلغاء',
-    profilePhoto: 'صورة الملف الشخصي',
-    uploadPhoto: 'رفع صورة',
-    photoUploaded: 'تم رفع الصورة بنجاح!',
-    changePhoto: 'تغيير الصورة',
-    photoHint: 'PNG, JPG, GIF حتى 10MB',
-    cropTitle: 'قص صورة الملف الشخصي',
-    choosePhoto: 'اختر صورة',
-    uploadToStart: 'ارفع صورة للبدء',
-    zoom: 'تكبير',
-    rotation: 'دوران',
-    cropAndUpload: 'قص ورفع',
-    requiredMark: '*',
-    selectPlaceholder: (label) => `اختر ${label}`,
-    missingFields: (fields) => `يرجى ملء الحقول المطلوبة: ${fields}`,
-    successMessage: 'تم إرسال التسجيل بنجاح!',
-    failMessage: 'فشل الإرسال. يرجى المحاولة مرة أخرى.',
-    categories: {
-      athlete: { label: 'رياضي', description: 'لاعب رياضي محترف أو هاوٍ' },
-      coach: { label: 'مدرب', description: 'مدرب رياضي أو مدرب بدني' },
-      scout: { label: 'كاشف مواهب', description: 'كاشف مواهب أو وكيل رياضي' },
-      sportProfessional: { label: 'محترف رياضي', description: 'متخصص في الصناعة الرياضية' },
-      fan: { label: 'مشجع', description: 'متحمس للرياضة وداعم' },
-    },
-    fields: {
-      fullName: 'الاسم الكامل', profession: 'المهنة', sport: 'اسم الرياضة',
-      dateOfBirth: 'تاريخ الميلاد', aboutYourself: 'اكتب عن نفسك',
-      currentTeam: 'الفريق الحالي', coachingSport: 'رياضة التدريب',
-      currentCompany: 'الشركة الحالية', firstName: 'الاسم الأول',
-      lastName: 'اسم العائلة', currentCompanyName: 'الشركة',
-      countryOfResidence: 'الدولة', email: 'البريد الإلكتروني',
-    },
-    placeholders: {
-      fullName: 'أدخل اسمك الكامل', profession: 'مثال: لاعب كرة قدم محترف',
-      currentTeam: 'مثال: نادي لاغوس المتحد', coachProfession: 'مثال: المدرب الرئيسي',
-      currentCompany: 'مثال: وكالة المواهب الرياضية', firstName: 'أدخل الاسم الأول',
-      lastName: 'أدخل اسم العائلة', currentCompanyName: 'اسم الشركة', email: 'أدخل البريد الإلكتروني',
-    },
-  },
-  fr: {
-    dir: 'ltr',
-    joinTitle: 'Rejoindre GreenLeaf',
-    joinSubtitle: 'Choisissez votre catégorie pour commencer',
-    registrationSuffix: 'Inscription',
-    fillDetails: 'Remplissez vos informations pour rejoindre notre communauté sportive',
-    backToCategories: '← Retour aux catégories',
-    completeRegistration: "Terminer l'inscription",
-    submitting: 'Envoi en cours...',
-    cancel: 'Annuler',
-    profilePhoto: 'Photo de profil',
-    uploadPhoto: 'Télécharger une photo',
-    photoUploaded: 'Photo téléchargée avec succès !',
-    changePhoto: 'Changer la photo',
-    photoHint: "PNG, JPG, GIF jusqu'à 10 Mo",
-    cropTitle: 'Recadrer la photo de profil',
-    choosePhoto: 'Choisir une photo',
-    uploadToStart: 'Téléchargez une photo pour commencer',
-    zoom: 'Zoom',
-    rotation: 'Rotation',
-    cropAndUpload: 'Recadrer et télécharger',
-    requiredMark: '*',
-    selectPlaceholder: (label) => `Sélectionner ${label}`,
-    missingFields: (fields) => `Veuillez remplir les champs requis : ${fields}`,
-    successMessage: 'Inscription soumise avec succès !',
-    failMessage: "L'envoi a échoué. Veuillez réessayer.",
-    categories: {
-      athlete: { label: 'Athlète', description: 'Sportif professionnel ou amateur' },
-      coach: { label: 'Entraîneur', description: 'Coach sportif ou entraîneur' },
-      scout: { label: 'Recruteur', description: 'Détecteur de talents ou agent sportif' },
-      sportProfessional: { label: 'Professionnel du sport', description: "Professionnel de l'industrie sportive" },
-      fan: { label: 'Fan', description: 'Passionné de sport et supporter' },
-    },
-    fields: {
-      fullName: 'Nom complet', profession: 'Profession', sport: 'Nom du sport',
-      dateOfBirth: 'Date de naissance', aboutYourself: 'Parlez de vous',
-      currentTeam: 'Équipe actuelle', coachingSport: 'Sport entraîné',
-      currentCompany: 'Entreprise actuelle', firstName: 'Prénom',
-      lastName: 'Nom de famille', currentCompanyName: 'Entreprise',
-      countryOfResidence: 'Pays', email: 'E-mail',
-    },
-    placeholders: {
-      fullName: 'Entrez votre nom complet', profession: 'ex. : Footballeur professionnel',
-      currentTeam: 'ex. : Lagos United FC', coachProfession: 'ex. : Entraîneur principal',
-      currentCompany: 'ex. : SportsTalent Agency', firstName: 'Entrez le prénom',
-      lastName: 'Entrez le nom de famille', currentCompanyName: "Nom de l'entreprise", email: "Entrez l'e-mail",
-    },
-  },
-};
+const FcSportsMode = ({ size, className }) => <span className={className} style={{ fontSize: size }}>⚽</span>;
+const VscOrganization = ({ size, className }) => <span className={className} style={{ fontSize: size }}>🏢</span>;
+const GiFlyingFlag = ({ size, className }) => <span className={className} style={{ fontSize: size }}>🚩</span>;
+const GiTeacher = ({ size, className }) => <span className={className} style={{ fontSize: size }}>📋</span>;
+const FaUsersViewfinder = ({ size, className }) => <span className={className} style={{ fontSize: size }}>🔍</span>;
+const FaUserTie = ({ size, className }) => <span className={className} style={{ fontSize: size }}>👔</span>;
 
 const COUNTRIES = [
-  { code: 'US', name: 'United States', flag: '🇺🇸' },
-  { code: 'SA', name: 'Saudi Arabia', flag: '🇸🇦' },
-  { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
-  { code: 'CA', name: 'Canada', flag: '🇨🇦' },
-  { code: 'AU', name: 'Australia', flag: '🇦🇺' },
-  { code: 'DE', name: 'Germany', flag: '🇩🇪' },
-  { code: 'FR', name: 'France', flag: '🇫🇷' },
-  { code: 'IT', name: 'Italy', flag: '🇮🇹' },
-  { code: 'ES', name: 'Spain', flag: '🇪🇸' },
-  { code: 'BR', name: 'Brazil', flag: '🇧🇷' }
+  { code: 'Eng', name: 'English' },
+  { code: 'Arabic', name: 'Arabic' },
+  { code: 'French', name: 'French' },
 ];
 
-const SPORTS = ['Athletics', 'Basketball', 'Football', 'Tennis', 'Swimming', 'Cricket', 'Golf', 'Other'];
-const CATEGORIES = ['athlete', 'coach', 'scout', 'sportProfessional', 'fan'];
-const CATEGORY_ICONS = { athlete: Trophy, coach: Users, scout: User, sportProfessional: Globe, fan: Heart };
+const SPORTS = [
+  'Basketball', 'Football', 'Athletics', 'Badminton', 'Baseball', 'Boxing', 'Cricket',
+  'Cycling', 'Golf', 'Gymnastics', 'Hockey', 'Martial Arts',
+  'Other', 'Rugby', 'Swimming', 'Table Tennis', 'Tennis', 'Volleyball',
+  'Weightlifting', 'Wrestling',
+];
+
+const EDUCATION_LEVELS = [
+  'High School', 'Associate Degree', "Bachelor's Degree",
+  "Master's Degree", 'Doctorate (PhD)', 'Professional Certification',
+  'Trade School', 'Other',
+];
 
 const getFormConfigs = (t) => ({
   athlete: [
-    { name: 'fullName', label: t.fields.fullName, type: 'text', required: true, placeholder: t.placeholders.fullName },
-    { name: 'profession', label: t.fields.profession, type: 'text', required: true, placeholder: t.placeholders.profession },
-    { name: 'sport', label: t.fields.sport, type: 'select', required: true, options: SPORTS },
-    { name: 'dateOfBirth', label: t.fields.dateOfBirth, type: 'date', required: true, icon: Calendar },
-    { name: 'aboutYourself', label: t.fields.aboutYourself, type: 'textarea', required: true, rows: 4 }
+    { name: 'language', label: t('register.language'), type: 'select', required: true, options: ['English', 'عربي', 'Français'] },
+    { name: 'fullName', label: t('register.fullName'), type: 'text', required: true, placeholder: t('register.fullNamePlaceholder') },
+    { name: 'position', label: t('register.positionOfPlay'), type: 'text', placeholder: t('register.positionPlaceholder') },
+    { name: 'school', label: t('register.schoolName'), type: 'text', placeholder: t('register.schoolPlaceholder') },
+    { name: 'sport', label: t('register.sportName'), type: 'select', required: true, options: SPORTS },
+    { name: 'dateOfBirth', label: t('register.dateOfBirth'), type: 'date', required: true, icon: Calendar },
+    { name: 'height', label: t('register.height'), type: 'height-select', required: true, icon: Ruler },
+    { name: 'country', label: t('register.countryOfResidence'), type: 'country-select', required: true, options: COUNTRIES, icon: MapPin },
+    { name: 'state', label: t('register.stateOfResidence'), type: 'text', required: true, placeholder: t('register.statePlaceholder') },
+    { name: 'city', label: t('register.cityOfResidence'), type: 'text', required: true, placeholder: t('register.cityPlaceholder') },
+    { name: 'fatherNationality', label: t('register.fatherNationality'), type: 'country-select', required: true, options: COUNTRIES, icon: Globe },
+    { name: 'motherNationality', label: t('register.motherNationality'), type: 'country-select', required: true, options: COUNTRIES, icon: Globe },
+    { name: 'highlights', label: t('register.youtubeLinks'), type: 'youtube-links', placeholder: t('register.youtubePlaceholder') },
+    { name: 'aboutYourself', label: t('register.aboutYourself'), type: 'textarea', required: true, rows: 4, placeholder: t('register.aboutAthletePlaceholder') },
+    { name: 'achievements', label: t('register.achievements'), type: 'achievement-list', rows: 3 },
   ],
   coach: [
-    { name: 'fullName', label: t.fields.fullName, type: 'text', required: true, placeholder: t.placeholders.fullName },
-    { name: 'currentTeam', label: t.fields.currentTeam, type: 'text', required: true, placeholder: t.placeholders.currentTeam },
-    { name: 'profession', label: t.fields.profession, type: 'text', required: true, placeholder: t.placeholders.coachProfession },
-    { name: 'coachingSport', label: t.fields.coachingSport, type: 'select', required: true, options: SPORTS }
+    { name: 'language', label: t('register.language'), type: 'select', required: true, options: ['English', 'عربي', 'Français'] },
+    { name: 'fullName', label: t('register.fullName'), type: 'text', required: true, placeholder: t('register.fullNamePlaceholder') },
+    { name: 'sport', label: t('register.coachingSport'), type: 'select', required: true, options: SPORTS },
+    { name: 'currentTeam', label: t('register.currentTeam'), type: 'text', required: true, placeholder: t('register.currentTeamPlaceholder') },
+    { name: 'aboutYourself', label: t('register.aboutYourself'), type: 'textarea', required: true, rows: 4, placeholder: t('register.aboutCoachPlaceholder') },
+    { name: 'country', label: t('register.countryOfResidence'), type: 'country-select', required: true, options: COUNTRIES, icon: MapPin },
+    { name: 'state', label: t('register.stateOfResidence'), type: 'text', required: true, placeholder: t('register.statePlaceholder') },
+    { name: 'city', label: t('register.cityOfResidence'), type: 'text', required: true, placeholder: t('register.cityPlaceholder') },
+    { name: 'achievements', label: t('register.achievements'), type: 'achievement-list', rows: 3 },
+    { name: 'experience', label: t('register.coachingExperience'), type: 'coaching-experience-list' },
+    { name: 'education', label: t('register.education'), type: 'education-list' },
   ],
   scout: [
-    { name: 'fullName', label: t.fields.fullName, type: 'text', required: true, placeholder: t.placeholders.fullName },
-    { name: 'currentCompany', label: t.fields.currentCompany, type: 'text', required: true, placeholder: t.placeholders.currentCompany }
+    { name: 'language', label: t('register.language'), type: 'select', required: true, options: ['English', 'عربي', 'Français'] },
+    { name: 'fullName', label: t('register.fullName'), type: 'text', required: true, placeholder: t('register.fullNamePlaceholder') },
+    { name: 'scoutingComapy', label: t('register.scoutingCompany'), type: 'text', required: true, placeholder: t('register.scoutingCompanyPlaceholder') },
+    { name: 'sport', label: t('register.scoutingSport'), type: 'select', required: true, options: SPORTS },
+    { name: 'aboutYourself', label: t('register.aboutYourself'), type: 'textarea', required: true, rows: 4, placeholder: t('register.aboutScoutPlaceholder') },
+    { name: 'country', label: t('register.countryOfResidence'), type: 'country-select', required: true, options: COUNTRIES, icon: MapPin },
+    { name: 'state', label: t('register.stateOfResidence'), type: 'text', required: true, placeholder: t('register.statePlaceholder') },
+    { name: 'city', label: t('register.cityOfResidence'), type: 'text', required: true, placeholder: t('register.cityPlaceholder') },
+    { name: 'experience', label: t('register.workExperience'), type: 'work-experience-list', required: true },
+    { name: 'education', label: t('register.education'), type: 'education-list', required: true },
   ],
   sportProfessional: [
-    { name: 'firstName', label: t.fields.firstName, type: 'text', required: true, placeholder: t.placeholders.firstName },
-    { name: 'lastName', label: t.fields.lastName, type: 'text', required: true, placeholder: t.placeholders.lastName },
-    { name: 'currentCompanyName', label: t.fields.currentCompanyName, type: 'text', required: true, placeholder: t.placeholders.currentCompanyName },
-    { name: 'countryOfResidence', label: t.fields.countryOfResidence, type: 'country-select', required: true, options: COUNTRIES }
+    { name: 'language', label: t('register.language'), type: 'select', required: true, options: ['English', 'عربي', 'Français'] },
+    { name: 'fullName', label: t('register.firstLastName'), type: 'text', required: true, placeholder: t('register.fullNamePlaceholder') },
+    { name: 'team', label: t('register.currentCompany'), type: 'text', required: true, placeholder: t('register.companyPlaceholder') },
+    { name: 'currentJobTitle', label: t('register.currentJobTitle'), type: 'text', required: true, placeholder: t('register.jobTitlePlaceholder') },
+    { name: 'country', label: t('register.selectYourCountry'), type: 'country-select', required: true, options: COUNTRIES, icon: MapPin },
+    { name: 'state', label: t('register.stateOfResidence'), type: 'text', required: true, placeholder: t('register.statePlaceholder') },
+    { name: 'city', label: t('register.cityOfResidence'), type: 'text', required: true, placeholder: t('register.cityPlaceholder') },
+    { name: 'experience', label: t('register.workExperience'), type: 'work-experience-list', required: true },
+    { name: 'education', label: t('register.education'), type: 'education-list', required: true },
+  ],
+  club: [
+    { name: 'language', label: t('register.language'), type: 'select', required: true, options: ['English', 'عربي', 'Français'] },
+    { name: 'clubName', label: t('register.clubName'), type: 'text', required: true, placeholder: t('register.clubNamePlaceholder') },
+    { name: 'sport', label: t('register.primarySport'), type: 'select', required: true, options: SPORTS },
+    { name: 'establishedYear', label: t('register.establishedYear'), type: 'date', required: true, icon: Calendar },
+    { name: 'aboutYourself', label: t('register.aboutClub'), type: 'textarea', required: true, rows: 4, placeholder: t('register.aboutClubPlaceholder') },
+    { name: 'country', label: t('register.selectYourCountry'), type: 'country-select', required: true, options: COUNTRIES, icon: MapPin },
+    { name: 'state', label: t('register.stateOfResidence'), type: 'text', required: true, placeholder: t('register.statePlaceholder') },
+    { name: 'city', label: t('register.cityOfResidence'), type: 'text', required: true, placeholder: t('register.cityPlaceholder') },
+    { name: 'achievements', label: t('register.achievements'), type: 'achievement-list', rows: 3 },
+    { name: 'highlights', label: t('register.clubYoutubeLinks'), type: 'youtube-links', placeholder: t('register.youtubePlaceholder') },
   ],
   fan: [
-    { name: 'firstName', label: t.fields.firstName, type: 'text', required: true, placeholder: t.placeholders.firstName },
-    { name: 'lastName', label: t.fields.lastName, type: 'text', required: true, placeholder: t.placeholders.lastName },
-    { name: 'email', label: t.fields.email, type: 'email', required: true, placeholder: t.placeholders.email }
-  ]
+    { name: 'fullName', label: t('register.fullName'), type: 'text', required: true, placeholder: t('register.firstNamePlaceholder') },
+    { name: 'sport', label: t('register.favoriteSport'), type: 'select', options: SPORTS },
+    { name: 'country', label: t('register.selectYourCountry'), type: 'country-select', required: true, options: COUNTRIES, icon: MapPin },
+    { name: 'state', label: t('register.stateOfResidence'), type: 'text', required: true, placeholder: t('register.statePlaceholder') },
+    { name: 'city', label: t('register.cityOfResidence'), type: 'text', required: true, placeholder: t('register.cityPlaceholder') },
+  ],
 });
 
-// ─── Responsive styles injected once ───────────────────────────────────────
-const GLOBAL_STYLES = `
-  *, *::before, *::after { box-sizing: border-box; }
-  body { margin: 0; padding: 0; }
+const getCategories = (t) => [
+  { id: 'athlete', label: t('register.athlete'), icon: FcSportsMode, description: t('register.athleteDesc') },
+  { id: 'coach', label: t('register.coach'), icon: GiTeacher, description: t('register.coachDesc') },
+  { id: 'scout', label: t('register.scout'), icon: FaUsersViewfinder, description: t('register.scoutDesc') },
+  { id: 'sportProfessional', label: t('register.sportProfessional'), icon: FaUserTie, description: t('register.sportProfessionalDesc') },
+  { id: 'club', label: t('register.club'), icon: VscOrganization, description: t('register.clubDesc') },
+  { id: 'fan', label: t('register.fan'), icon: GiFlyingFlag, description: t('register.fanDesc') },
+];
 
-  .reg-page {
-    min-height: 100vh;
-    background: #f9fafb;
-    padding: 0 0 40px;
-    overflow-x: hidden;
-  }
+const SimpleTextInput = ({ id, type = 'text', value, onChange, placeholder, className, style, min, max, rows }) => {
+  if (type === 'textarea') return <textarea id={id} value={value || ''} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className={className} style={style} rows={rows} />;
+  return <input id={id} type={type} value={value || ''} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className={className} style={style} min={min} max={max} />;
+};
 
-  /* Language switcher – always LTR, top-right */
-  .lang-switcher-wrap {
-    position: fixed;
-    top: 72px;          /* below header */
-    right: 16px;
-    z-index: 999;
-  }
-  @media (max-width: 480px) {
-    .lang-switcher-wrap { top: 64px; right: 8px; }
-  }
+const SimpleSelectInput = ({ id, value, onChange, options, placeholder, className, style }) => (
+  <select id={id} value={value || ''} onChange={(e) => onChange(e.target.value)} className={className} style={style}>
+    <option value="">{placeholder}</option>
+    {options?.map(option => <option key={option} value={option}>{option}</option>)}
+  </select>
+);
 
-  .lang-switcher {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 9999px;
-    padding: 4px 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    white-space: nowrap;
-    user-select: none;
-  }
-  .lang-btn {
-    font-size: 11px;
-    font-weight: 700;
-    padding: 3px 8px;
-    border-radius: 9999px;
-    border: none;
-    cursor: pointer;
-    width: 32px;
-    text-align: center;
-    transition: background 0.15s, color 0.15s;
-  }
+const SimpleCountrySelect = ({ id, value, onChange, options, placeholder, className, style }) => (
+  <select id={id} value={value || ''} onChange={(e) => onChange(e.target.value)} className={className} style={style}>
+    <option value="">{placeholder}</option>
+    {options?.map(country => <option key={country.code} value={country.name}>{country.name}</option>)}
+  </select>
+);
 
-  /* Page container */
-  .reg-container {
-    width: 100%;
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 80px 16px 24px;  /* top padding accounts for fixed header + lang switcher */
-  }
-  @media (min-width: 640px) {
-    .reg-container { padding: 88px 24px 32px; }
-  }
-  @media (min-width: 1024px) {
-    .reg-container { padding: 100px 40px 40px; }
-  }
-
-  /* Header text */
-  .reg-title {
-    font-size: clamp(1.5rem, 5vw, 2.5rem);
-    font-weight: 800;
-    color: #111827;
-    margin: 0 0 12px;
-    line-height: 1.2;
-  }
-  .reg-subtitle {
-    font-size: clamp(0.875rem, 2.5vw, 1.125rem);
-    color: #6b7280;
-    margin: 0 0 32px;
-  }
-
-  /* Category grid */
-  .categories-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-  @media (min-width: 480px) {
-    .categories-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
-  }
-  @media (min-width: 640px) {
-    .categories-grid { grid-template-columns: repeat(3, 1fr); }
-  }
-  @media (min-width: 1024px) {
-    .categories-grid { grid-template-columns: repeat(5, 1fr); gap: 20px; }
-  }
-
-  /* Category card */
-  .cat-card {
-    background: white;
-    border-radius: 14px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    border: 2px solid transparent;
-    padding: 20px 12px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.25s;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 140px;
-  }
-  .cat-card:hover {
-    border-color: #16a34a;
-    box-shadow: 0 8px 24px rgba(22,163,74,0.18);
-    transform: translateY(-4px);
-  }
-  @media (max-width: 479px) {
-    .cat-card { padding: 16px 8px; min-height: 120px; }
-    .cat-card-title { font-size: 14px !important; }
-    .cat-card-desc { font-size: 11px !important; }
-    .cat-icon-wrap { width: 44px !important; height: 44px !important; margin-bottom: 10px !important; }
-  }
-
-  /* Form card */
-  .form-card {
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-    padding: 20px 16px;
-  }
-  @media (min-width: 640px) {
-    .form-card { padding: 28px 24px; }
-  }
-  @media (min-width: 768px) {
-    .form-card { padding: 36px 32px; }
-  }
-
-  /* Form grid */
-  .form-fields-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-  @media (min-width: 640px) {
-    .form-fields-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
-  }
-
-  /* Textarea spans full width */
-  .field-fullwidth {
-    grid-column: 1 / -1;
-  }
-
-  /* Inputs */
-  .reg-input, .reg-select, .reg-textarea {
-    width: 100%;
-    padding: 10px 14px;
-    border: 1.5px solid #d1d5db;
-    border-radius: 10px;
-    font-size: clamp(14px, 2vw, 15px);
-    color: #111827;
-    background: white;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    outline: none;
-    -webkit-appearance: none;
-    appearance: none;
-  }
-  .reg-input:focus, .reg-select:focus, .reg-textarea:focus {
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22,163,74,0.12);
-  }
-  .reg-select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    padding-right: 36px;
-    cursor: pointer;
-  }
-  [dir="rtl"] .reg-select {
-    background-position: left 12px center;
-    padding-right: 14px;
-    padding-left: 36px;
-  }
-  .reg-textarea { resize: vertical; min-height: 100px; }
-  .reg-input-with-icon { padding-left: 40px; }
-  [dir="rtl"] .reg-input-with-icon { padding-left: 14px; padding-right: 40px; }
-
-  /* Field label */
-  .field-label {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-    color: #374151;
-    margin-bottom: 6px;
-  }
-
-  /* Photo upload */
-  .photo-upload-box {
-    border: 2px dashed #d1d5db;
-    border-radius: 12px;
-    padding: 28px 16px;
-    text-align: center;
-    transition: border-color 0.2s;
-  }
-  .photo-upload-box:hover { border-color: #16a34a; }
-
-  /* Action buttons */
-  .btn-primary {
-    flex: 1;
-    min-width: 0;
-    background: #16a34a;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    padding: 12px 16px;
-    font-size: clamp(14px, 2vw, 15px);
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .btn-primary:hover:not(:disabled) { background: #15803d; }
-  .btn-primary:disabled { background: #86efac; cursor: not-allowed; }
-
-  .btn-secondary {
-    background: #f3f4f6;
-    color: #374151;
-    border: none;
-    border-radius: 10px;
-    padding: 12px 20px;
-    font-size: clamp(14px, 2vw, 15px);
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-  .btn-secondary:hover:not(:disabled) { background: #e5e7eb; }
-
-  .btn-row {
-    display: flex;
-    gap: 12px;
-    margin-top: 28px;
-    align-items: stretch;
-  }
-  @media (max-width: 400px) {
-    .btn-row { flex-direction: column; }
-    .btn-secondary { flex: 1; }
-  }
-
-  /* Crop modal */
-  .crop-modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.55);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px;
-  }
-  .crop-modal {
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    width: 100%;
-    max-width: 800px;
-    max-height: 95vh;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-  }
-  .crop-modal-header {
-    position: sticky;
-    top: 0;
-    background: white;
-    border-bottom: 1px solid #e5e7eb;
-    padding: 14px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 10;
-    flex-shrink: 0;
-  }
-  .crop-canvas-area {
-    position: relative;
-    background: #f9fafb;
-    border-radius: 10px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: clamp(260px, 50vw, 480px);
-    user-select: none;
-  }
-  .crop-controls {
-    padding: 16px 20px 20px;
-  }
-`;
-
-// ─── Language Switcher ──────────────────────────────────────────────────────
-const LanguageSwitcher = ({ lang, setLang }) => {
-  const options = [
-    { code: 'en', label: 'EN', full: 'English' },
-    { code: 'ar', label: 'AR', full: 'العربية' },
-    { code: 'fr', label: 'FR', full: 'Français' },
-  ];
+const WorkExperienceList = ({ label, value, onChange }) => {
+  const { t } = useTranslation();
+  const experiences = value || [{ organization: '', position: '', start: '', end: '', country: '', state: '', city: '', current: '' }];
+  const addExperience = () => onChange([...experiences, { organization: '', position: '', start: '', end: '', country: '', state: '', city: '', current: '' }]);
+  const removeExperience = (index) => { if (experiences.length > 1) onChange(experiences.filter((_, i) => i !== index)); };
+  const updateExperience = (index, field, newValue) => { const updated = [...experiences]; updated[index] = { ...updated[index], [field]: newValue }; onChange(updated); };
   return (
-    <div className="lang-switcher" dir="ltr">
-      <Globe size={14} style={{ color: '#9ca3af', marginRight: 4, flexShrink: 0 }} />
-      {options.map((opt, i) => (
-        <React.Fragment key={opt.code}>
-          <button
-            onClick={() => setLang(opt.code)}
-            title={opt.full}
-            className="lang-btn"
-            style={{
-              background: lang === opt.code ? '#16a34a' : 'transparent',
-              color: lang === opt.code ? 'white' : '#6b7280',
-            }}
-          >
-            {opt.label}
-          </button>
-          {i < options.length - 1 && <span style={{ color: '#e5e7eb', fontSize: 12, flexShrink: 0 }}>|</span>}
-        </React.Fragment>
+    <div className="space-y-4 sm:space-y-6">
+      {experiences.map((experience, index) => (
+        <div key={index} className="border border-gray-300 rounded-lg p-3 sm:p-4 space-y-3 sm:space-y-4">
+          <div className="flex justify-between items-center">
+            <label className="block text-sm font-medium text-gray-700">{label}</label>
+            {experiences.length > 1 && <button type="button" onClick={() => removeExperience(index)} className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-colors"><Trash2 size={16} /></button>}
+          </div>
+          <SimpleTextInput value={experience.organization} onChange={(v) => updateExperience(index, 'organization', v)} className="w-full px-3 sm:px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base" placeholder={label} style={{ fontSize: '16px' }} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">{t('register.position')}</label>
+              <SimpleTextInput value={experience.position} onChange={(v) => updateExperience(index, 'position', v)} className="w-full px-3 sm:px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base" style={{ fontSize: '16px' }} />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">{t('register.startedDate')}</label>
+              <SimpleTextInput type="date" value={experience.start} onChange={(v) => updateExperience(index, 'start', v)} className="w-full px-3 sm:px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base" style={{ fontSize: '16px' }} />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">{t('register.currentJobRole')}</label>
+              <select value={experience.current} onChange={(e) => updateExperience(index, 'current', e.target.value)} className="w-full px-3 sm:px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base" style={{ fontSize: '16px' }}>
+                <option value="present">{t('register.present')}</option>
+                <option value="past">{t('register.past')}</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <SimpleTextInput type="date" value={experience.end} onChange={(v) => updateExperience(index, 'end', v)} className="w-full px-3 sm:px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base" style={{ fontSize: '16px' }} />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">{t('register.country')}</label>
+              <select value={experience.country} onChange={(e) => updateExperience(index, 'country', e.target.value)} className="w-full px-3 sm:px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base" style={{ fontSize: '16px' }}>
+                <option value="" disabled>{t('register.selectCountry')}</option>
+                {COUNTRIES.map(c => <option key={c.code} value={c.name}>{c.name}</option>)}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">{t('register.state')}</label>
+              <SimpleTextInput value={experience.state} onChange={(v) => updateExperience(index, 'state', v)} className="w-full px-3 sm:px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base" style={{ fontSize: '16px' }} />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">{t('register.city')}</label>
+              <SimpleTextInput value={experience.city} onChange={(v) => updateExperience(index, 'city', v)} className="w-full px-3 sm:px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base" style={{ fontSize: '16px' }} />
+            </div>
+          </div>
+        </div>
+      ))}
+      <button type="button" onClick={addExperience} className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-base font-medium" style={{ fontSize: '16px' }}>
+        {t('register.clickToAddMore')}
+      </button>
+    </div>
+  );
+};
+
+const AchievementList = ({ value, onChange }) => {
+  const { t } = useTranslation();
+  const experiences = value || [{ title: '', year: '', description: '' }];
+  const addExperience = () => onChange([...experiences, { title: '', year: '', description: '' }]);
+  const removeExperience = (index) => { if (experiences.length > 1) onChange(experiences.filter((_, i) => i !== index)); };
+  const updateExperience = (index, field, newValue) => { const updated = [...experiences]; updated[index] = { ...updated[index], [field]: newValue }; onChange(updated); };
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      {experiences.map((experience, index) => (
+        <div key={index} className="border border-gray-300 rounded-lg p-3 sm:p-4 space-y-3 sm:space-y-4">
+          <div className="flex justify-between items-center">
+            <label className="block text-sm font-medium text-gray-700">{t('register.achievementEventName')}</label>
+            {experiences.length > 1 && <button type="button" onClick={() => removeExperience(index)} className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-colors"><Trash2 size={16} /></button>}
+          </div>
+          <SimpleTextInput value={experience.title} onChange={(v) => updateExperience(index, 'title', v)} className="w-full px-3 sm:px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base" placeholder={t('register.achievementEventName')} style={{ fontSize: '16px' }} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">{t('register.achievementYear')}</label>
+              <SimpleTextInput value={experience.year} onChange={(v) => updateExperience(index, 'year', v)} className="w-full px-3 sm:px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base" style={{ fontSize: '16px' }} />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">{t('register.achievementName')}</label>
+              <SimpleTextInput value={experience.description} onChange={(v) => updateExperience(index, 'description', v)} className="w-full px-3 sm:px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base" style={{ fontSize: '16px' }} />
+            </div>
+          </div>
+        </div>
+      ))}
+      <button type="button" onClick={addExperience} className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-base font-medium" style={{ fontSize: '16px' }}>
+        {t('register.clickToAddMore')}
+      </button>
+    </div>
+  );
+};
+
+const EducationList = ({ value, onChange }) => {
+  const { t } = useTranslation();
+  const educations = value || [{ school: '', level: '', field: '', startYear: '', endYear: '', completed: false }];
+  const addEducation = () => onChange([...educations, { school: '', level: '', field: '', startYear: '', endYear: '', completed: false }]);
+  const removeEducation = (index) => { if (educations.length > 1) onChange(educations.filter((_, i) => i !== index)); };
+  const updateEducation = (index, field, newValue) => { const updated = [...educations]; updated[index] = { ...updated[index], [field]: newValue }; onChange(updated); };
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      {educations.map((education, index) => (
+        <div key={index} className="border border-gray-300 rounded-lg p-3 sm:p-4 space-y-3 sm:space-y-4">
+          <div className="flex justify-between items-center">
+            <h4 className="text-sm font-medium text-green-600">{t('register.education')}</h4>
+            {educations.length > 1 && <button type="button" onClick={() => removeEducation(index)} className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-colors"><Trash2 size={16} /></button>}
+          </div>
+          <SimpleTextInput value={education.school} onChange={(v) => updateEducation(index, 'school', v)} className="w-full px-3 sm:px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base" placeholder={t('register.schoolNamePlaceholder')} style={{ fontSize: '16px' }} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-green-600">{t('register.educationLevel')}</label>
+              <SimpleSelectInput value={education.level} onChange={(v) => updateEducation(index, 'level', v)} options={EDUCATION_LEVELS} placeholder={t('register.educationLevelPlaceholder')} className="w-full px-3 sm:px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base" style={{ fontSize: '16px' }} />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-green-600">{t('register.degreeName')}</label>
+              <SimpleTextInput value={education.field} onChange={(v) => updateEducation(index, 'field', v)} className="w-full px-3 sm:px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base" placeholder={t('register.degreeNamePlaceholder')} style={{ fontSize: '16px' }} />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-green-600">{t('register.startYear')}</label>
+            <SimpleTextInput type="date" value={education.startYear} onChange={(v) => updateEducation(index, 'startYear', v)} className="w-full px-3 sm:px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base" style={{ fontSize: '16px' }} />
+          </div>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-green-600">{t('register.completed')}</label>
+            <select value={education.completed} onChange={(e) => updateEducation(index, 'completed', e.target.value)} className="w-full px-3 sm:px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base" style={{ fontSize: '16px' }}>
+              <option value="">{t('register.select')}</option>
+              <option value="yes">{t('register.yes')}</option>
+              <option value="no">{t('register.inProgress')}</option>
+            </select>
+          </div>
+          {education.completed === 'yes' && (
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-green-600">{t('register.graduationYear')}</label>
+              <SimpleTextInput type="date" value={education.endYear} onChange={(v) => updateEducation(index, 'endYear', v)} className="w-full px-3 sm:px-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base" style={{ fontSize: '16px' }} />
+            </div>
+          )}
+        </div>
+      ))}
+      <button type="button" onClick={addEducation} className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-base font-medium" style={{ fontSize: '16px' }}>
+        {t('register.clickToAddMore')}
+      </button>
+    </div>
+  );
+};
+
+const HeightInput = ({ value, onChange, IconComponent }) => {
+  const { t } = useTranslation();
+  const [unit, setUnit] = useState('cm');
+  const [showUnitMenu, setShowUnitMenu] = useState(false);
+  const [feet, setFeet] = useState('');
+  const [inches, setInches] = useState('');
+  const [cm, setCm] = useState('');
+  const heightUnits = [
+    { value: 'cm', label: t('register.centimeters') },
+    { value: 'ft', label: t('register.feetInches') },
+  ];
+  React.useEffect(() => {
+    if (value && typeof value === 'object') {
+      setUnit(value.unit || 'cm');
+      if (value.unit === 'ft') { setFeet(value.feet || ''); setInches(value.inches || ''); }
+      else { setCm(value.cm || ''); }
+    }
+  }, [value]);
+  return (
+    <div className="space-y-3">
+      <div className="relative">
+        <button type="button" onClick={() => setShowUnitMenu(!showUnitMenu)} className="w-full px-4 py-2 text-left bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 hover:bg-gray-50 transition-colors" style={{ fontSize: '16px' }}>
+          <div className="flex justify-between items-center">
+            <span>{heightUnits.find(u => u.value === unit)?.label || t('register.chooseHeightUnit')}</span>
+            <svg className={`w-5 h-5 transition-transform ${showUnitMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+          </div>
+        </button>
+        {showUnitMenu && (
+          <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
+            {heightUnits.map(unitOption => (
+              <button key={unitOption.value} type="button" onClick={() => { setUnit(unitOption.value); setShowUnitMenu(false); if (unitOption.value === 'cm') onChange({ unit: unitOption.value, cm }); else onChange({ unit: unitOption.value, feet, inches }); }} className={`w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors ${unit === unitOption.value ? 'bg-green-50 text-green-600' : 'text-gray-700'}`} style={{ fontSize: '16px' }}>
+                {unitOption.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="relative">
+        {IconComponent && <IconComponent size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10" />}
+        {unit === 'cm' ? (
+          <SimpleTextInput type="number" min="100" max="250" value={cm} onChange={(v) => { setCm(v); onChange({ unit: 'cm', cm: v }); }} className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${IconComponent ? 'pl-10' : ''}`} placeholder={t('register.heightPlaceholder')} style={{ fontSize: '16px' }} />
+        ) : (
+          <div className="flex gap-2">
+            <div className="flex-1 relative">
+              <SimpleTextInput type="number" min="3" max="8" value={feet} onChange={(v) => { setFeet(v); onChange({ unit: 'ft', feet: v, inches }); }} className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent pr-12`} placeholder="5" style={{ fontSize: '16px' }} />
+              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 text-sm">ft</span>
+            </div>
+            <div className="flex-1 relative">
+              <SimpleTextInput type="number" min="0" max="11" value={inches} onChange={(v) => { setInches(v); onChange({ unit: 'ft', feet, inches: v }); }} className="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="8" style={{ fontSize: '16px' }} />
+              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 text-sm">in</span>
+            </div>
+          </div>
+        )}
+      </div>
+      {showUnitMenu && <div className="fixed inset-0 z-5" onClick={() => setShowUnitMenu(false)} />}
+    </div>
+  );
+};
+
+const YouTubeLinksInput = ({ value, onChange }) => {
+  const { t } = useTranslation();
+  const links = value || [''];
+  const addLink = () => onChange([...links, '']);
+  const removeLink = (index) => { if (links.length > 1) onChange(links.filter((_, i) => i !== index)); };
+  const updateLink = (index, newValue) => { const updated = [...links]; updated[index] = newValue; onChange(updated); };
+  return (
+    <div className="space-y-3">
+      {links.map((link, index) => (
+        <div key={index} className="flex gap-2 items-center">
+          <SimpleTextInput type="url" value={link} onChange={(v) => updateLink(index, v)} className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder={t('register.youtubePlaceholder')} style={{ fontSize: '16px' }} />
+          {links.length > 1 && <button type="button" onClick={() => removeLink(index)} className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={18} /></button>}
+          {index === links.length - 1 && <button type="button" onClick={addLink} className="p-2 text-green-600 hover:text-green-700 hover:bg-green-50 rounded-lg transition-colors"><Plus size={18} /></button>}
+        </div>
       ))}
     </div>
   );
 };
 
-// ─── Input Components ───────────────────────────────────────────────────────
-const SimpleTextInput = ({ id, type, value, onChange, placeholder, rows }) => {
-  if (type === 'textarea')
-    return <textarea id={id} value={value || ''} onChange={e => onChange(e.target.value)} placeholder={placeholder} className="reg-textarea" rows={rows} />;
-  return <input id={id} type={type || 'text'} value={value || ''} onChange={e => onChange(e.target.value)} placeholder={placeholder} className="reg-input" />;
-};
-
-const SimpleSelectInput = ({ id, value, onChange, options, placeholder }) => (
-  <select id={id} value={value || ''} onChange={e => onChange(e.target.value)} className="reg-select">
-    <option value="">{placeholder}</option>
-    {options?.map(o => <option key={o} value={o}>{o}</option>)}
-  </select>
-);
-
-const SimpleCountrySelect = ({ id, value, onChange, options, placeholder }) => (
-  <select id={id} value={value || ''} onChange={e => onChange(e.target.value)} className="reg-select">
-    <option value="">{placeholder}</option>
-    {options?.map(c => <option key={c.code} value={c.name}>{c.flag} {c.name}</option>)}
-  </select>
-);
-
-// ─── Image Cropper Modal ────────────────────────────────────────────────────
-const ImageCropperModal = ({ isOpen, onClose, onCropComplete, t }) => {
-  const [image, setImage] = useState(null);
-  const [scale, setScale] = useState(1);
-  const [rotation, setRotation] = useState(0);
-  const [cropBox, setCropBox] = useState({ x: 40, y: 40, width: 180, height: 180 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [isResizing, setIsResizing] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [resizeHandle, setResizeHandle] = useState(null);
-  const canvasRef = useRef(null);
-  const imageRef = useRef(null);
-  const containerRef = useRef(null);
-  const fileInputRef = useRef(null);
-
-  const handleFileSelect = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = ev => { setImage(ev.target.result); setCropBox({ x: 40, y: 40, width: 180, height: 180 }); };
-      reader.readAsDataURL(file);
-    }
+const ProfileImageUploader = ({ onChange }) => {
+  const { t } = useTranslation();
+  const [imageSrc, setImageSrc] = useState(null);
+  const [croppedImage, setCroppedImage] = useState(null);
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => setImageSrc(reader.result); }
   };
-
-  const handleMouseDown = (e, handle) => {
-    e.preventDefault(); e.stopPropagation();
-    if (handle) { setIsResizing(true); setResizeHandle(handle); setIsDragging(false); }
-    else { setIsDragging(true); setIsResizing(false); }
-    setDragStart({ x: e.clientX, y: e.clientY });
+  const acceptImage = () => {
+    fetch(imageSrc).then(r => r.blob()).then(blob => { setCroppedImage(URL.createObjectURL(blob)); if (onChange) onChange('profilePhoto', blob); });
   };
-
-  const handleTouchStart = (e, handle) => {
-    const touch = e.touches[0];
-    handleMouseDown({ preventDefault: () => {}, stopPropagation: () => {}, clientX: touch.clientX, clientY: touch.clientY }, handle);
-  };
-
-  const getEventCoords = (e) => {
-    if (e.touches) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
-    return { x: e.clientX, y: e.clientY };
-  };
-
-  const handleMove = (e) => {
-    if (!isDragging && !isResizing) return;
-    const { x: clientX, y: clientY } = getEventCoords(e);
-    const container = containerRef.current;
-    if (!container) return;
-    const rect = container.getBoundingClientRect();
-    const mouseX = clientX - rect.left;
-    const mouseY = clientY - rect.top;
-    if (isDragging) {
-      const deltaX = clientX - dragStart.x;
-      const deltaY = clientY - dragStart.y;
-      setCropBox(prev => ({
-        ...prev,
-        x: Math.max(0, Math.min(rect.width - prev.width, prev.x + deltaX)),
-        y: Math.max(0, Math.min(rect.height - prev.height, prev.y + deltaY))
-      }));
-      setDragStart({ x: clientX, y: clientY });
-    } else if (isResizing) {
-      setCropBox(prev => {
-        let nb = { ...prev };
-        if (resizeHandle.includes('e')) nb.width = Math.max(50, Math.min(rect.width - prev.x, mouseX - prev.x));
-        if (resizeHandle.includes('w')) { const nx = Math.max(0, Math.min(prev.x + prev.width - 50, mouseX)); nb.x = nx; nb.width = prev.x + prev.width - nx; }
-        if (resizeHandle.includes('s')) nb.height = Math.max(50, Math.min(rect.height - prev.y, mouseY - prev.y));
-        if (resizeHandle.includes('n')) { const ny = Math.max(0, Math.min(prev.y + prev.height - 50, mouseY)); nb.y = ny; nb.height = prev.y + prev.height - ny; }
-        return nb;
-      });
-    }
-  };
-
-  const handleUp = () => { setIsDragging(false); setIsResizing(false); setResizeHandle(null); };
-
-  const handleCrop = () => {
-    if (!image || !canvasRef.current || !imageRef.current || !containerRef.current) return;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    const img = imageRef.current;
-    const container = containerRef.current;
-    const cr = container.getBoundingClientRect();
-    const ir = img.getBoundingClientRect();
-    const sx = img.naturalWidth / ir.width;
-    const sy = img.naturalHeight / ir.height;
-    const ox = ir.left - cr.left;
-    const oy = ir.top - cr.top;
-    canvas.width = cropBox.width * sx;
-    canvas.height = cropBox.height * sy;
-    ctx.drawImage(img, (cropBox.x - ox) * sx, (cropBox.y - oy) * sy, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
-    canvas.toBlob(blob => {
-      const file = new File([blob], 'profile-photo.jpg', { type: 'image/jpeg' });
-      onCropComplete(file, canvas.toDataURL('image/jpeg'));
-      handleClose();
-    }, 'image/jpeg', 0.9);
-  };
-
-  const handleClose = () => { setImage(null); setScale(1); setRotation(0); setCropBox({ x: 40, y: 40, width: 180, height: 180 }); onClose(); };
-
-  if (!isOpen) return null;
-
+  const cancelUpload = () => { setImageSrc(null); setCroppedImage(null); };
   return (
-    <div className="crop-modal-overlay" onMouseMove={handleMove} onMouseUp={handleUp} onTouchMove={handleMove} onTouchEnd={handleUp} dir={t.dir}>
-      <div className="crop-modal">
-        <div className="crop-modal-header">
-          <h2 style={{ fontSize: 'clamp(15px,3vw,19px)', fontWeight: 700, margin: 0, color: '#111827' }}>{t.cropTitle}</h2>
-          <button onClick={handleClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, borderRadius: 8 }}><X size={20} /></button>
-        </div>
-        <div style={{ padding: '16px 20px', flex: 1 }}>
-          {!image ? (
-            <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-              <Camera size={44} style={{ color: '#9ca3af', display: 'block', margin: '0 auto 16px' }} />
-              <p style={{ color: '#6b7280', marginBottom: 16, fontSize: 14 }}>{t.uploadToStart}</p>
-              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} style={{ display: 'none' }} id="crop-file-input" />
-              <label htmlFor="crop-file-input" style={{ display: 'inline-block', background: '#16a34a', color: 'white', padding: '10px 24px', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 14 }}>{t.choosePhoto}</label>
-            </div>
-          ) : (
-            <>
-              <div ref={containerRef} className="crop-canvas-area">
-                <canvas ref={canvasRef} style={{ display: 'none' }} />
-                <img ref={imageRef} src={image} alt="Preview" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', pointerEvents: 'none', transform: `scale(${scale}) rotate(${rotation}deg)`, transition: 'transform 0.2s' }} />
-                <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
-                  <div
-                    style={{ position: 'absolute', left: cropBox.x, top: cropBox.y, width: cropBox.width, height: cropBox.height, border: '2px solid #16a34a', cursor: 'move', pointerEvents: 'auto', boxShadow: '0 0 0 9999px rgba(0,0,0,0.45)' }}
-                    onMouseDown={e => handleMouseDown(e, null)}
-                    onTouchStart={e => handleTouchStart(e, null)}
-                  >
-                    {['nw','n','ne','w','e','sw','s','se'].map(h => (
-                      <div key={h} style={{
-                        position: 'absolute', width: 14, height: 14, background: 'white', border: '2px solid #16a34a', borderRadius: '50%', cursor: `${h}-resize`, zIndex: 10,
-                        ...(h.includes('n') && { top: -7 }), ...(h.includes('s') && { bottom: -7 }),
-                        ...(h.includes('w') && { left: -7 }), ...(h.includes('e') && { right: -7 }),
-                        ...(!h.includes('n') && !h.includes('s') && { top: 'calc(50% - 7px)' }),
-                        ...(!h.includes('w') && !h.includes('e') && { left: 'calc(50% - 7px)' })
-                      }}
-                        onMouseDown={e => handleMouseDown(e, h)}
-                        onTouchStart={e => handleTouchStart(e, h)}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-              <div className="crop-controls">
-                <div style={{ marginBottom: 16 }}>
-                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 8 }}>{t.zoom}</label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <ZoomOut size={16} style={{ color: '#6b7280', flexShrink: 0 }} />
-                    <input type="range" min="0.5" max="3" step="0.1" value={scale} onChange={e => setScale(parseFloat(e.target.value))} style={{ flex: 1 }} />
-                    <ZoomIn size={16} style={{ color: '#6b7280', flexShrink: 0 }} />
-                  </div>
-                </div>
-                <div style={{ marginBottom: 20 }}>
-                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 8 }}>{t.rotation}</label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <RotateCw size={16} style={{ color: '#6b7280', flexShrink: 0 }} />
-                    <input type="range" min="0" max="360" step="1" value={rotation} onChange={e => setRotation(parseInt(e.target.value))} style={{ flex: 1 }} />
-                    <span style={{ fontSize: 13, color: '#6b7280', width: 36, textAlign: 'right' }}>{rotation}°</span>
-                  </div>
-                </div>
-                <div style={{ display: 'flex', gap: 10 }}>
-                  <button type="button" onClick={() => fileInputRef.current?.click()} style={{ flex: 1, background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 10, padding: '10px 12px', fontWeight: 600, cursor: 'pointer', fontSize: 14 }}>{t.changePhoto}</button>
-                  <button type="button" onClick={handleCrop} style={{ flex: 1, background: '#16a34a', color: 'white', border: 'none', borderRadius: 10, padding: '10px 12px', fontWeight: 600, cursor: 'pointer', fontSize: 14 }}>{t.cropAndUpload}</button>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
+    <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-green-500 transition-colors">
+      <label className="block text-sm font-medium text-gray-700 mb-2">{t('register.profilePhoto')}</label>
+      {!imageSrc && !croppedImage && (
+        <label style={{ cursor: 'pointer' }}>
+          <Camera size={48} className="mx-auto text-gray-400 mb-4" />
+          <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
+          <span className="text-green-600 hover:text-green-700 font-medium">{t('register.uploadPhoto')}</span>
+          <span className="text-gray-500"> {t('register.dragDrop')}</span>
+        </label>
+      )}
+      {imageSrc && !croppedImage && (
+        <>
+          <img src={imageSrc} alt="Preview" style={{ maxWidth: '100%', maxHeight: '300px', margin: 'auto', borderRadius: '8px' }} />
+          <div className="flex justify-center gap-4 mt-4">
+            <button className="cursor-pointer px-6 py-2 bg-blue-600 text-white font-medium rounded-lg shadow-md hover:bg-blue-700 active:scale-95 transition duration-200" onClick={acceptImage}>{t('register.useThisPhoto')}</button>
+            <button className="cursor-pointer px-6 py-2 bg-red-600 text-white font-medium rounded-lg shadow-md hover:bg-red-700 active:scale-95 transition duration-200" onClick={cancelUpload}>{t('register.cancel')}</button>
+          </div>
+        </>
+      )}
+      {croppedImage && (
+        <>
+          <h3 className="text-xl font-semibold text-gray-800 mt-3 mb-2">{t('register.selectedPhoto')}</h3>
+          <img src={croppedImage} alt="Profile" style={{ width: 150, height: 150, borderRadius: '50%', margin: 'auto', objectFit: 'cover' }} />
+          <br />
+          <button className="cursor-pointer px-6 py-2 bg-red-500 text-white font-medium rounded-lg shadow-md hover:bg-red-600 active:scale-95 transition duration-200 mt-2" onClick={cancelUpload}>{t('register.remove')}</button>
+        </>
+      )}
     </div>
   );
 };
 
-// ─── Photo Upload ───────────────────────────────────────────────────────────
-const PhotoUpload = ({ onChange, previewUrl, t }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  return (
-    <>
-      <ImageCropperModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onCropComplete={(f, d) => onChange('profilePhoto', f, d)} t={t} />
-      <div className="field-fullwidth">
-        <label className="field-label">{t.profilePhoto}</label>
-        <div className="photo-upload-box">
-          {previewUrl ? (
-            <div>
-              <img src={previewUrl} alt="Profile" style={{ width: 100, height: 100, borderRadius: '50%', margin: '0 auto 12px', objectFit: 'cover', border: '4px solid #16a34a', display: 'block' }} />
-              <p style={{ color: '#16a34a', fontWeight: 600, fontSize: 13, marginBottom: 8 }}>{t.photoUploaded}</p>
-              <button type="button" onClick={() => setIsModalOpen(true)} style={{ background: 'none', border: 'none', color: '#16a34a', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>{t.changePhoto}</button>
-            </div>
-          ) : (
-            <>
-              <Camera size={36} style={{ color: '#9ca3af', display: 'block', margin: '0 auto 12px' }} />
-              <button type="button" onClick={() => setIsModalOpen(true)} style={{ background: 'none', border: 'none', color: '#16a34a', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}>{t.uploadPhoto}</button>
-              <p style={{ color: '#9ca3af', fontSize: 12, marginTop: 6 }}>{t.photoHint}</p>
-            </>
-          )}
-        </div>
-      </div>
-    </>
-  );
-};
-
-// ─── Form Field ─────────────────────────────────────────────────────────────
-const FormField = ({ field, value, onChange, t }) => {
-  const id = `${field.name}-input`;
+const FormField = ({ field, value, onChange }) => {
+  const { t } = useTranslation();
+  const fieldId = `${field.name}-input`;
   const IconComponent = field.icon;
-  const isTextarea = field.type === 'textarea';
-
-  const handleChange = (val) => {
-    if (field.name === 'profilePhoto') onChange(field.name, val);
-    else onChange(field.name, val);
-  };
-
-  let input;
-  if (field.type === 'textarea') input = <SimpleTextInput id={id} type="textarea" rows={field.rows || 4} value={value} onChange={handleChange} placeholder={field.placeholder} />;
-  else if (field.type === 'select') input = <SimpleSelectInput id={id} value={value} onChange={handleChange} options={field.options} placeholder={t.selectPlaceholder(field.label)} />;
-  else if (field.type === 'country-select') input = <SimpleCountrySelect id={id} value={value} onChange={handleChange} options={field.options} placeholder={t.selectPlaceholder(field.label)} />;
-  else {
-    const cls = `reg-input${IconComponent ? ' reg-input-with-icon' : ''}`;
-    input = <input id={id} type={field.type || 'text'} value={value || ''} onChange={e => handleChange(e.target.value)} placeholder={field.placeholder} className={cls} />;
+  const baseClasses = `w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${IconComponent && field.type !== 'height-select' ? 'pl-10' : ''}`;
+  const handleFieldChange = (newValue) => onChange(field.name, newValue);
+  const inputStyle = { fontSize: '16px' };
+  let inputElement;
+  switch (field.type) {
+    case 'textarea': inputElement = <SimpleTextInput id={fieldId} type="textarea" rows={field.rows || 4} value={value} onChange={handleFieldChange} className={baseClasses} placeholder={field.placeholder} style={{ ...inputStyle, resize: 'vertical' }} />; break;
+    case 'select': inputElement = <SimpleSelectInput id={fieldId} value={value} onChange={handleFieldChange} options={field.options} placeholder={field.placeholder || `Select ${field.label}`} className={baseClasses} style={inputStyle} />; break;
+    case 'country-select': inputElement = <SimpleCountrySelect id={fieldId} value={value} onChange={handleFieldChange} options={field.options} placeholder={field.placeholder || `Select ${field.label}`} className={baseClasses} style={inputStyle} />; break;
+    case 'work-experience-list': inputElement = <WorkExperienceList label={t('register.companyName')} value={value} onChange={handleFieldChange} />; break;
+    case 'coaching-experience-list': inputElement = <WorkExperienceList label={t('register.coachedTeam')} value={value} onChange={handleFieldChange} />; break;
+    case 'achievement-list': inputElement = <AchievementList value={value} onChange={handleFieldChange} />; break;
+    case 'education-list': inputElement = <EducationList value={value} onChange={handleFieldChange} />; break;
+    case 'height-select': inputElement = <HeightInput value={value} onChange={handleFieldChange} IconComponent={IconComponent} />; break;
+    case 'youtube-links': inputElement = <YouTubeLinksInput value={value} onChange={handleFieldChange} />; break;
+    default: inputElement = <SimpleTextInput id={fieldId} type={field.type} min={field.min} max={field.max} value={value} onChange={handleFieldChange} className={baseClasses} placeholder={field.placeholder} style={inputStyle} />;
   }
-
   return (
-    <div className={isTextarea ? 'field-fullwidth' : ''}>
-      <label htmlFor={id} className="field-label">{field.label} {field.required && <span style={{ color: '#dc2626' }}>*</span>}</label>
-      <div style={{ position: 'relative' }}>
-        {IconComponent && (
-          <IconComponent size={16} style={{ position: 'absolute', left: t.dir === 'rtl' ? 'auto' : 12, right: t.dir === 'rtl' ? 12 : 'auto', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', pointerEvents: 'none' }} />
-        )}
-        {input}
+    <div>
+      <label htmlFor={fieldId} className="block text-sm font-medium text-gray-700 mb-2">
+        {field.label} {field.required && <span className="text-red-500">*</span>}
+      </label>
+      <div className="relative">
+        {IconComponent && field.type !== 'height-select' && <IconComponent size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />}
+        {inputElement}
       </div>
     </div>
   );
 };
 
-// ─── Category Card ──────────────────────────────────────────────────────────
-const CategoryCard = ({ categoryId, t, onClick }) => {
-  const Icon = CATEGORY_ICONS[categoryId];
-  const cat = t.categories[categoryId];
+const CategoryCard = ({ category, onClick }) => {
+  const IconComponent = category.icon;
   return (
-    <div onClick={onClick} className="cat-card" role="button" tabIndex={0} onKeyDown={e => e.key === 'Enter' && onClick()}>
-      <div className="cat-icon-wrap" style={{ background: '#dcfce7', borderRadius: '50%', width: 56, height: 56, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
-        <Icon size={22} style={{ color: '#16a34a' }} />
+    <div onClick={onClick} className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer border-2 border-transparent hover:border-green-500 p-6 text-center" role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } }}>
+      <div className="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+        <IconComponent size={32} className="text-green-600" />
       </div>
-      <h3 className="cat-card-title" style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: '0 0 6px' }}>{cat.label}</h3>
-      <p className="cat-card-desc" style={{ fontSize: 12, color: '#6b7280', margin: 0, lineHeight: 1.4 }}>{cat.description}</p>
+      <h3 className="text-xl font-semibold text-gray-800 mb-2">{category.label}</h3>
+      <p className="text-sm text-gray-600">{category.description}</p>
     </div>
   );
 };
 
-// ─── Main Component ─────────────────────────────────────────────────────────
+
+
 const SportsRegistration = () => {
-  const [lang, setLang] = useState('en');
+  const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState('');
   const [formData, setFormData] = useState({});
-  const [photoPreview, setPhotoPreview] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const t = TRANSLATIONS[lang];
-  const formConfigs = getFormConfigs(t);
-  const currentFormConfig = formConfigs[selectedCategory] || [];
-
-  const handleInputChange = (name, value, dataUrl) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
-    if (name === 'profilePhoto' && dataUrl) setPhotoPreview(dataUrl);
-  };
-
-  const handleCategorySelect = (id) => { setSelectedCategory(id); setFormData({}); setPhotoPreview(''); };
-  const handleReset = () => { setSelectedCategory(''); setFormData({}); setPhotoPreview(''); };
-
-  const validateForm = () => currentFormConfig.filter(f => f.required).filter(f => { const v = formData[f.name]; return !v || (typeof v === 'string' && !v.trim()); }).map(f => f.name);
-
+  const [submitted, setSubmitted] = useState(false);
+  const CATEGORIES = getCategories(t);
+  const FORM_CONFIGS = getFormConfigs(t);
+  const currentFormConfig = FORM_CONFIGS[selectedCategory] || [];
+  const requiredFields = currentFormConfig.filter(f => f.required).map(f => f.name);
+  const handleInputChange = (fieldName, value) => setFormData(prev => ({ ...prev, [fieldName]: value }));
+  const handleCategorySelect = (categoryId) => { setSelectedCategory(categoryId); setFormData({}); };
+  const validateForm = () => requiredFields.filter(field => { const value = formData[field]; return !value || (typeof value === 'string' && value.trim() === ''); });
   const handleSubmit = async () => {
-    const missing = validateForm();
-    if (missing.length) { alert(t.missingFields(missing.join(', '))); return; }
+    const missingFields = validateForm();
+    if (missingFields.length > 0) { alert(`${t('register.missingFields')} ${missingFields.join(', ')}`); return; }
     setIsSubmitting(true);
-    try {
-      await new Promise(r => setTimeout(r, 1000));
-      alert(t.successMessage);
-      handleReset();
-    } catch { alert(t.failMessage); }
-    finally { setIsSubmitting(false); }
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setIsSubmitting(false);
+    setSubmitted(true);
+    setTimeout(() => { setFormData({}); setSelectedCategory(''); setSubmitted(false); }, 2000);
   };
+  const handleReset = () => { setSelectedCategory(''); setFormData({}); };
 
-  return (
-    <>
-      <style>{GLOBAL_STYLES}</style>
-      <div className="reg-page" dir={t.dir}>
-        <div className="lang-switcher-wrap" dir="ltr">
-          <LanguageSwitcher lang={lang} setLang={setLang} />
-        </div>
-
-        <div className="reg-container">
-          {!selectedCategory ? (
-            <>
-              <div style={{ textAlign: 'center' }}>
-                <h1 className="reg-title">{t.joinTitle}</h1>
-                <p className="reg-subtitle">{t.joinSubtitle}</p>
-              </div>
-              <div className="categories-grid">
-                {CATEGORIES.map(id => (
-                  <CategoryCard key={id} categoryId={id} t={t} onClick={() => handleCategorySelect(id)} />
-                ))}
-              </div>
-            </>
-          ) : (
-            <>
-              <div style={{ textAlign: 'center', marginBottom: 28 }}>
-                <button onClick={handleReset} type="button" style={{ background: 'none', border: 'none', color: '#16a34a', fontWeight: 600, fontSize: 14, cursor: 'pointer', marginBottom: 10, display: 'inline-block' }}>
-                  {t.backToCategories}
-                </button>
-                <h1 className="reg-title">{t.categories[selectedCategory]?.label} {t.registrationSuffix}</h1>
-                <p className="reg-subtitle">{t.fillDetails}</p>
-              </div>
-              <div className="form-card">
-                <div className="form-fields-grid">
-                  {currentFormConfig.map(field => (
-                    <FormField key={field.name} field={field} value={formData[field.name]} onChange={handleInputChange} t={t} />
-                  ))}
-                  <PhotoUpload onChange={handleInputChange} previewUrl={photoPreview} t={t} />
-                </div>
-                <div className="btn-row">
-                  <button className="btn-primary" onClick={handleSubmit} disabled={isSubmitting}>
-                    {isSubmitting ? t.submitting : t.completeRegistration}
-                  </button>
-                  <button className="btn-secondary" onClick={handleReset} disabled={isSubmitting}>
-                    {t.cancel}
-                  </button>
-                </div>
-              </div>
-            </>
-          )}
+  if (!selectedCategory) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+       
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">{t('register.joinTitle')}</h1>
+              <p className="text-lg text-gray-600">{t('register.joinSubtitle')}</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {CATEGORIES.map(category => <CategoryCard key={category.id} category={category} onClick={() => handleCategorySelect(category.id)} />)}
+            </div>
+          </div>
         </div>
       </div>
-    </>
+    );
+  }
+
+  const categoryData = CATEGORIES.find(c => c.id === selectedCategory);
+  const categoryLabel = categoryData?.label || selectedCategory;
+  const gridFields = currentFormConfig.filter(field => field.type !== 'textarea');
+  const textareaFields = currentFormConfig.filter(field => field.type === 'textarea');
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+     
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <button onClick={handleReset} className="text-green-600 hover:text-green-700 mb-4 inline-flex items-center text-sm font-medium transition-colors" type="button">
+              {t('register.backToCategories')}
+            </button>
+            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">{categoryLabel} {t('register.registrationSuffix')}</h1>
+            <p className="text-lg text-gray-600">{t('register.fillDetails')}</p>
+          </div>
+          <div className="bg-white rounded-xl shadow-lg p-6 lg:p-8">
+            <div className="space-y-6">
+              {gridFields.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {gridFields.map(field => <FormField key={field.name} field={field} value={formData[field.name]} onChange={handleInputChange} />)}
+                </div>
+              )}
+              {textareaFields.map(field => <FormField key={field.name} field={field} value={formData[field.name]} onChange={handleInputChange} />)}
+              <ProfileImageUploader onChange={handleInputChange} />
+            </div>
+            {submitted && (
+              <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700 text-center font-medium">
+                {t('register.successMessage')}
+              </div>
+            )}
+            <div className="mt-8 flex flex-col sm:flex-row gap-4">
+              <button onClick={handleSubmit} disabled={isSubmitting} className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed text-white py-3 px-6 rounded-lg font-medium transition-colors duration-200">
+                {isSubmitting ? t('register.submitting') : t('register.completeRegistration')}
+              </button>
+              <button onClick={handleReset} disabled={isSubmitting} className="sm:flex-none bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed text-gray-700 py-3 px-6 rounded-lg font-medium transition-colors duration-200">
+                {t('register.cancel')}
+              </button>
+            </div>
+          </div>
+          <div className="mt-6 text-center text-sm text-gray-500">
+            <p>
+              {t('register.termsText')}{' '}
+              <a href="#" className="text-green-600 hover:text-green-700 transition-colors" onClick={(e) => e.preventDefault()}>{t('register.termsLink')}</a>
+              {' '}{t('register.and')}{' '}
+              <a href="#" className="text-green-600 hover:text-green-700 transition-colors" onClick={(e) => e.preventDefault()}>{t('register.privacyLink')}</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
